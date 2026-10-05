@@ -2065,3 +2065,59 @@ body::after {
     position: relative;
     z-index: 10;
 }
+/* =========================================
+   STARTSEITE - ZENTRIEREN
+========================================= */
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+}
+
+.menu {
+    position: absolute !important;
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+
+    width: min(900px, 90vw);
+    text-align: center;
+    z-index: 20;
+}
+
+/* Logo */
+.logo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+/* Untertitel */
+.subtitle {
+    text-align: center;
+    margin: 18px auto 30px;
+}
+
+/* Buttons */
+.menu-buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+}
+
+.chaos-button {
+    width: min(520px, 82vw);
+    margin: 0 auto;
+}
+
+/* Version */
+.version {
+    text-align: center;
+    margin-top: 25px;
+}
