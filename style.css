@@ -75,3 +75,123 @@ body::before {
             scale(1.02);
     }
 }
+.background {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.light {
+    position: absolute;
+
+    width: 35vw;
+    height: 75vh;
+
+    filter: blur(35px);
+
+    opacity: 0.18;
+
+    transform-origin: center top;
+
+    animation:
+        lightMove 8s ease-in-out infinite alternate;
+}
+
+.light-1 {
+    left: 5%;
+    top: -20%;
+
+    background:
+        linear-gradient(
+            160deg,
+            transparent 20%,
+            rgba(180, 100, 255, 0.7),
+            transparent 70%
+        );
+
+    transform: rotate(-18deg);
+}
+
+.light-2 {
+    left: 35%;
+    top: -25%;
+
+    background:
+        linear-gradient(
+            160deg,
+            transparent 20%,
+            rgba(255, 90, 190, 0.6),
+            transparent 70%
+        );
+
+    animation-delay: -3s;
+}
+
+.light-3 {
+    right: 0;
+    top: -20%;
+
+    background:
+        linear-gradient(
+            160deg,
+            transparent 20%,
+            rgba(70, 170, 255, 0.55),
+            transparent 70%
+        );
+
+    animation-delay: -5s;
+}
+
+@keyframes lightMove {
+
+    from {
+        transform:
+            rotate(-18deg)
+            translateX(-25px);
+    }
+
+    to {
+        transform:
+            rotate(18deg)
+            translateX(25px);
+    }
+}
+.logo-word span {
+    display: inline-block;
+
+    position: relative;
+
+    cursor: grab;
+
+    user-select: none;
+    -webkit-user-select: none;
+
+    /* SEHR WICHTIG FÜR IPAD */
+    touch-action: none;
+    -webkit-touch-callout: none;
+
+    will-change: transform;
+
+    transform:
+        translate3d(
+            var(--x, 0px),
+            var(--y, 0px),
+            0
+        )
+        rotate(var(--rotation, 0deg));
+
+    transition:
+        transform 0.08s linear;
+}
+
+.logo-word span.dragging {
+    cursor: grabbing;
+
+    filter:
+        drop-shadow(
+            0 0 12px
+            rgba(255,255,255,0.45)
+        );
+}
