@@ -1,358 +1,225 @@
-/* =========================
-   SPIEL ERSTELLEN
-========================= */
+document.addEventListener("DOMContentLoaded", () => {
 
-function createGame() {
+    const letters =
+        document.querySelectorAll(".logo-word span");
 
-    const code =
-        Math.random()
-        .toString(36)
-        .substring(2, 6)
-        .toUpperCase();
+    let active = null;
 
-    document.getElementById("game").innerHTML = `
+    letters.forEach(letter => {
 
-        <div class="game-popup">
+        letter.dataset.x = "0";
+        letter.dataset.y = "0";
 
-            <h2>🎉 ROOM CREATED!</h2>
+        letter.addEventListener(
+            "pointerdown",
+            startDrag,
+            { passive: false }
+        );
 
-            <div class="room-code">
-                ${code}
-            </div>
-
-            <p>
-                Gib diesen Code deinen Freunden!
-            </p>
-
-        </div>
-    `;
-}
+    });
 
 
-/* =========================
-   SPIEL BEITRETEN
-========================= */
+    function startDrag(e) {
 
-function joinGame() {
+        e.preventDefault();
 
-    document.getElementById("game").innerHTML = `
+        active = e.currentTarget;
 
-        <div class="game-popup">
+        active.classList.add("dragging");
 
-            <h2>🚪 JOIN GAME</h2>
+        active.setPointerCapture(e.pointerId);
 
-            <input
-                id="roomCode"
-                maxlength="4"
-                placeholder="ABCD"
-                autocomplete="off"
-            >
+        active.startX = e.clientX;
+        active.startY = e.clientY;
 
-            <button
-                class="chaos-button"
-                onclick="joinRoom()"
-            >
-                LOS GEHT'S!
-            </button>
+        active.startLetterX =
+            Number(active.dataset.x);
 
-        </div>
-    `;
-}
-
-
-/* =========================
-   RAUM BEITRETEN
-========================= */
-
-function joinRoom() {
-
-    const input =
-        document.getElementById("roomCode");
-
-    const code =
-        input.value
-        .trim()
-        .toUpperCase();
-
-    if (code.length !== 4) {
-
-        input.classList.add("shake");
-
-        setTimeout(() => {
-            input.classList.remove("shake");
-        }, 400);
-
-        return;
+        active.startLetterY =
+            Number(active.dataset.y);
     }
 
-    alert(
-        "Du trittst Raum " +
-        code +
-        " bei!"
+
+    document.addEventListener(
+        "pointermove",
+        e => {
+
+            if (!active) return;
+
+            e.preventDefault();
+
+            const dx =
+                e.clientX - active.startX;
+
+            const dy =
+                e.clientY - active.startY;
+
+
+            const x =
+                active.startLetterX + dx;
+
+            const y =
+                active.startLetterY + dy;
+
+
+            /*
+             * Die Bewegung wird leicht
+             * gedämpft, damit es organischer wirkt.
+             */
+
+            const rotation =
+                Math.max(
+                    -28,
+                    Math.min(
+                        28,
+                        dx * 0.12
+                    )
+                );
+
+
+            active.dataset.x = x;
+            active.dataset.y = y;
+
+
+            active.style.setProperty(
+                "--x",
+                `${x}px`
+            );
+
+            active.style.setProperty(
+                "--y",
+                `${y}px`
+            );
+
+            active.style.setProperty(
+                "--rotation",
+                `${rotation}deg`
+            );
+
+        },
+        { passive: false }
     );
-}
 
 
-/* =========================
-   KONFETTI / PARTIKEL
-========================= */
+    document.addEventListener(
+        "pointerup",
+        e => {
 
-const particleContainer =
-    document.getElementById("particles");
+            if (!active) return;
 
-
-const particleSymbols = [
-    "◆",
-    "●",
-    "✦",
-    "■",
-    "★"
-];
+            active.classList.remove("dragging");
 
 
-function createParticle() {
+            /*
+             * Kleine Partikel beim Loslassen
+             */
 
-    const particle =
-        document.createElement("div");
-
-    particle.className =
-        "particle";
-
-    particle.innerText =
-        particleSymbols[
-            Math.floor(
-                Math.random() *
-                particleSymbols.length
-            )
-        ];
-
-    particle.style.left =
-        Math.random() * 100 + "%";
-
-    particle.style.top =
-        Math.random() * 100 + "%";
-
-    particle.style.fontSize =
-        Math.random() * 12 + 6 + "px";
-
-    particle.style.animationDuration =
-        Math.random() * 4 + 3 + "s";
-
-    particle.style.animationDelay =
-        Math.random() * 2 + "s";
-
-    particleContainer.appendChild(
-        particle
-    );
+            createBurst(
+                e.clientX,
+                e.clientY
+            );
 
 
-    setTimeout(() => {
+            const finalX =
+                Number(active.dataset.x);
 
-        particle.remove();
-
-    }, 8000);
-}
-
-
-/* ständig neue Partikel */
-
-setInterval(
-    createParticle,
-    250
-);
-/* =====================================
-   INTERAKTIVE PARTY-CHAOS BUCHSTABEN
-===================================== */
-
-const letters =
-    document.querySelectorAll(".logo-word span");
-
-let draggedLetter = null;
-
-let startX = 0;
-let startY = 0;
-
-let currentX = 0;
-let currentY = 0;
+            const finalY =
+                Number(active.dataset.y);
 
 
-/* Buchstabe wird angefasst */
+            /*
+             * Feder-Effekt
+             */
 
-letters.forEach(letter => {
+            active.style.transition =
+                "transform .65s cubic-bezier(.16,1.35,.35,1)";
 
-    letter.addEventListener(
-        "pointerdown",
-        startDrag
+
+            active.style.setProperty(
+                "--x",
+                `${finalX * 0.72}px`
+            );
+
+            active.style.setProperty(
+                "--y",
+                `${finalY * 0.72}px`
+            );
+
+            active.style.setProperty(
+                "--rotation",
+                "0deg"
+            );
+
+
+            active.dataset.x =
+                finalX * 0.72;
+
+            active.dataset.y =
+                finalY * 0.72;
+
+
+            setTimeout(() => {
+
+                if (active) {
+
+                    active.style.transition =
+                        "transform .08s linear";
+                }
+
+            }, 650);
+
+
+            active = null;
+
+        }
     );
 
 });
+function createBurst(x, y) {
+
+    const amount = 12;
+
+    for (let i = 0; i < amount; i++) {
+
+        const particle =
+            document.createElement("div");
+
+        particle.className =
+            "burst-particle";
 
 
-function startDrag(event) {
+        particle.style.left =
+            `${x}px`;
 
-    event.preventDefault();
+        particle.style.top =
+            `${y}px`;
 
-    draggedLetter = event.currentTarget;
 
-    draggedLetter.setPointerCapture(
-        event.pointerId
-    );
+        const angle =
+            Math.random() * Math.PI * 2;
 
-    startX = event.clientX;
-    startY = event.clientY;
+        const distance =
+            30 + Math.random() * 70;
 
-    currentX =
-        parseFloat(
-            draggedLetter.dataset.x || 0
+
+        particle.style.setProperty(
+            "--dx",
+            `${Math.cos(angle) * distance}px`
         );
 
-    currentY =
-        parseFloat(
-            draggedLetter.dataset.y || 0
-        );
-
-    draggedLetter.style.transition =
-        "none";
-
-    draggedLetter.addEventListener(
-        "pointermove",
-        dragLetter
-    );
-
-    draggedLetter.addEventListener(
-        "pointerup",
-        stopDrag
-    );
-
-    draggedLetter.addEventListener(
-        "pointercancel",
-        stopDrag
-    );
-}
-
-
-/* Buchstabe bewegen */
-
-function dragLetter(event) {
-
-    if (!draggedLetter) return;
-
-    const movementX =
-        event.clientX - startX;
-
-    const movementY =
-        event.clientY - startY;
-
-
-    const newX =
-        currentX + movementX;
-
-    const newY =
-        currentY + movementY;
-
-
-    /*
-       Je schneller/weiter man zieht,
-       desto stärker dreht sich der Buchstabe
-    */
-
-    const rotation =
-        Math.max(
-            -25,
-            Math.min(
-                25,
-                movementX * 0.18
-            )
+        particle.style.setProperty(
+            "--dy",
+            `${Math.sin(angle) * distance}px`
         );
 
 
-    draggedLetter.style.setProperty(
-        "--drag-x",
-        newX + "px"
-    );
-
-    draggedLetter.style.setProperty(
-        "--drag-y",
-        newY + "px"
-    );
-
-    draggedLetter.style.setProperty(
-        "--drag-rotation",
-        rotation + "deg"
-    );
-
-
-    draggedLetter.dataset.x =
-        newX;
-
-    draggedLetter.dataset.y =
-        newY;
-}
-
-
-/* Loslassen */
-
-function stopDrag(event) {
-
-    if (!draggedLetter) return;
-
-
-    draggedLetter.releasePointerCapture(
-        event.pointerId
-    );
-
-
-    draggedLetter.style.transition =
-        "transform 0.55s cubic-bezier(.2,1.6,.4,1)";
-
-
-    /*
-       leicht zurückfedern,
-       aber nicht komplett auf
-       die ursprüngliche Position
-    */
-
-    const x =
-        parseFloat(
-            draggedLetter.dataset.x || 0
-        );
-
-    const y =
-        parseFloat(
-            draggedLetter.dataset.y || 0
+        document.body.appendChild(
+            particle
         );
 
 
-    draggedLetter.style.setProperty(
-        "--drag-x",
-        (x * 0.45) + "px"
-    );
-
-    draggedLetter.style.setProperty(
-        "--drag-y",
-        (y * 0.45) + "px"
-    );
-
-    draggedLetter.style.setProperty(
-        "--drag-rotation",
-        "0deg"
-    );
-
-
-    draggedLetter.removeEventListener(
-        "pointermove",
-        dragLetter
-    );
-
-    draggedLetter.removeEventListener(
-        "pointerup",
-        stopDrag
-    );
-
-    draggedLetter.removeEventListener(
-        "pointercancel",
-        stopDrag
-    );
-
-    draggedLetter = null;
+        setTimeout(() => {
+            particle.remove();
+        }, 650);
+    }
 }
