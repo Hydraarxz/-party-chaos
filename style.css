@@ -2121,3 +2121,27 @@ body {
     text-align: center;
     margin-top: 25px;
 }
+/* =========================================
+   THREE.JS 3D CANVAS
+========================================= */
+
+#stage3d {
+    position: fixed;
+    inset: 0;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 1;
+    display: block;
+    pointer-events: none;
+}
+
+/* Alte CSS-Bühne ausblenden */
+.stage-objects {
+    display: none !important;
+}
+
+/* Das Menü bleibt ganz vorne */
+.menu {
+    position: relative;
+    z-index: 20;
+}
