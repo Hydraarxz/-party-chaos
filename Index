@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Party Chaos</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Neon Licht hinter dem Logo -->
+    <div class="neon-light"></div>
+
+    <!-- Hintergrund-Partikel -->
+    <div id="particles"></div>
+
+    <!-- Glühbirnen -->
+    <div class="bulbs">
+        <span>💡</span>
+        <span>💡</span>
+        <span>💡</span>
+        <span>💡</span>
+        <span>💡</span>
+        <span>💡</span>
+        <span>💡</span>
+        <span>💡</span>
+    </div>
+
+    <main class="menu">
+
+        <!-- HAUPTLOGO -->
+        <div class="logo">
+
+            <div class="logo-word party">
+                <span>P</span>
+                <span>A</span>
+                <span>R</span>
+                <span>T</span>
+                <span>Y</span>
+            </div>
+
+            <div class="logo-word chaos">
+                <span>C</span>
+                <span>H</span>
+                <span>A</span>
+                <span>O</span>
+                <span>S</span>
+            </div>
+
+        </div>
+
+        <p class="subtitle">
+            DAS CHAOTISCHSTE PARTY-GAME
+        </p>
+
+        <!-- BUTTONS -->
+        <div class="menu-buttons">
+
+            <button class="chaos-button create"
+                    onclick="createGame()">
+                <span>🎮</span>
+                SPIEL ERSTELLEN
+            </button>
+
+            <button class="chaos-button join"
+                    onclick="joinGame()">
+                <span>🚪</span>
+                SPIEL BEITRETEN
+            </button>
+
+        </div>
+
+        <div id="game"></div>
+
+        <p class="version">v0.1 • CHAOS EDITION</p>
+
+    </main>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
