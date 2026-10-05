@@ -1030,3 +1030,369 @@ body {
 
     pointer-events: none;
 }
+/* =========================================
+   PARTY CHAOS - REALISTIC PARTY STAGE
+   ========================================= */
+
+body {
+    background:
+        radial-gradient(
+            ellipse at 50% 35%,
+            rgba(90, 20, 150, 0.32),
+            transparent 45%
+        ),
+        radial-gradient(
+            ellipse at 20% 60%,
+            rgba(0, 120, 255, 0.16),
+            transparent 40%
+        ),
+        radial-gradient(
+            ellipse at 80% 60%,
+            rgba(255, 0, 170, 0.16),
+            transparent 40%
+        ),
+        linear-gradient(
+            180deg,
+            #030006 0%,
+            #0b0615 45%,
+            #160821 75%,
+            #050207 100%
+        );
+
+    overflow-x: hidden;
+}
+
+
+/* =========================================
+   TIEFE IM HINTERGRUND
+   ========================================= */
+
+.background {
+    background:
+        /* ganz hinten kleine Lichtpunkte */
+        radial-gradient(circle at 15% 25%,
+            rgba(255,255,255,0.18) 0 2px,
+            transparent 3px),
+
+        radial-gradient(circle at 27% 18%,
+            rgba(120,200,255,0.18) 0 2px,
+            transparent 4px),
+
+        radial-gradient(circle at 73% 20%,
+            rgba(255,100,220,0.20) 0 2px,
+            transparent 4px),
+
+        radial-gradient(circle at 88% 32%,
+            rgba(255,220,100,0.18) 0 2px,
+            transparent 4px),
+
+        /* Bühnenlicht im Raum */
+        radial-gradient(
+            ellipse at 50% 45%,
+            rgba(120, 0, 180, 0.20),
+            transparent 55%
+        ),
+
+        /* dunkler Raum */
+        linear-gradient(
+            180deg,
+            #05030a 0%,
+            #090511 48%,
+            #110717 70%,
+            #030205 100%
+        );
+
+    box-shadow:
+        inset 0 0 180px rgba(0,0,0,0.95);
+}
+
+
+/* =========================================
+   DECKE DER BÜHNE
+   ========================================= */
+
+.background::before {
+    content: "";
+
+    position: absolute;
+    left: -10%;
+    top: -15%;
+
+    width: 120%;
+    height: 45%;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(0,0,0,0.95),
+            rgba(10,5,20,0.75),
+            transparent
+        );
+
+    border-bottom:
+        1px solid rgba(255,255,255,0.025);
+
+    box-shadow:
+        0 25px 70px rgba(0,0,0,0.8);
+
+    pointer-events: none;
+}
+
+
+/* =========================================
+   BÜHNENBODEN
+   ========================================= */
+
+.background::after {
+    content: "";
+
+    position: absolute;
+
+    left: -15%;
+    bottom: -20%;
+
+    width: 130%;
+    height: 50%;
+
+    transform: perspective(500px) rotateX(58deg);
+
+    transform-origin: center bottom;
+
+    background:
+
+        /* farbige Reflexionen */
+        radial-gradient(
+            ellipse at 50% 0%,
+            rgba(180,0,255,0.24),
+            transparent 48%
+        ),
+
+        radial-gradient(
+            ellipse at 25% 10%,
+            rgba(0,160,255,0.14),
+            transparent 35%
+        ),
+
+        radial-gradient(
+            ellipse at 75% 10%,
+            rgba(255,0,170,0.14),
+            transparent 35%
+        ),
+
+        /* Boden */
+        linear-gradient(
+            180deg,
+            rgba(35,15,45,0.55),
+            rgba(2,1,5,0.98)
+        );
+
+    border-top:
+        1px solid rgba(255,255,255,0.06);
+
+    box-shadow:
+        0 -25px 80px rgba(130,0,180,0.12);
+
+    pointer-events: none;
+}
+
+
+/* =========================================
+   FEINER NEBEL IN DER BÜHNE
+   ========================================= */
+
+.background {
+    isolation: isolate;
+}
+
+.background .light {
+    z-index: 2;
+}
+
+
+/* Nebel-Layer über dem Boden */
+
+.background .light::after {
+    content: "";
+
+    position: absolute;
+
+    left: -50%;
+    top: 35%;
+
+    width: 200%;
+    height: 35%;
+
+    background:
+        radial-gradient(
+            ellipse,
+            rgba(255,255,255,0.035),
+            transparent 65%
+        );
+
+    filter: blur(35px);
+
+    pointer-events: none;
+}
+
+
+/* =========================================
+   HINTERE PARTY-LICHTER
+   ========================================= */
+
+.background {
+    --party-glow:
+        radial-gradient(
+            circle at 8% 48%,
+            rgba(0,180,255,0.13),
+            transparent 10%
+        ),
+        radial-gradient(
+            circle at 18% 38%,
+            rgba(255,0,180,0.10),
+            transparent 9%
+        ),
+        radial-gradient(
+            circle at 82% 42%,
+            rgba(255,220,0,0.11),
+            transparent 9%
+        ),
+        radial-gradient(
+            circle at 94% 52%,
+            rgba(100,0,255,0.13),
+            transparent 10%
+        );
+
+    background-image:
+        var(--party-glow),
+        radial-gradient(
+            ellipse at 50% 45%,
+            rgba(100,0,160,0.20),
+            transparent 55%
+        ),
+        linear-gradient(
+            180deg,
+            #040208,
+            #0b0612 50%,
+            #120718 75%,
+            #020103
+        );
+}
+
+
+/* =========================================
+   KLEINE LEUCHTPUNKTE / BOKEH
+   ========================================= */
+
+.background .light-1::before,
+.background .light-2::before,
+.background .light-3::before {
+    content: "";
+
+    position: absolute;
+
+    width: 8px;
+    height: 8px;
+
+    border-radius: 50%;
+
+    background: white;
+
+    box-shadow:
+        0 0 8px white,
+        0 0 20px currentColor;
+
+    opacity: 0.7;
+
+    animation: tinyLight 2s ease-in-out infinite alternate;
+}
+
+.background .light-1::before {
+    top: 42%;
+    left: 30%;
+}
+
+.background .light-2::before {
+    top: 30%;
+    left: 50%;
+    animation-delay: 0.7s;
+}
+
+.background .light-3::before {
+    top: 48%;
+    left: 65%;
+    animation-delay: 1.3s;
+}
+
+@keyframes tinyLight {
+
+    from {
+        opacity: 0.25;
+        transform: scale(0.7);
+    }
+
+    to {
+        opacity: 0.9;
+        transform: scale(1.3);
+    }
+}
+
+
+/* =========================================
+   LEICHTES ATMEN DER GESAMTEN BÜHNE
+   ========================================= */
+
+.background {
+    animation: stageAtmosphere 8s ease-in-out infinite alternate;
+}
+
+@keyframes stageAtmosphere {
+
+    from {
+        filter: brightness(0.92);
+    }
+
+    to {
+        filter: brightness(1.06);
+    }
+}
+
+
+/* =========================================
+   LOGO BEKOMMT LICHT AUS DER BÜHNE
+   ========================================= */
+
+.neon-light {
+    mix-blend-mode: screen;
+
+    filter: blur(40px);
+
+    opacity: 0.85;
+}
+
+
+/* =========================================
+   SCHWARZE RÄNDER FÜR MEHR TIEFE
+   ========================================= */
+
+body::after {
+    content: "";
+
+    position: fixed;
+
+    inset: 0;
+
+    pointer-events: none;
+
+    z-index: 4;
+
+    background:
+        radial-gradient(
+            ellipse at center,
+            transparent 35%,
+            rgba(0,0,0,0.18) 65%,
+            rgba(0,0,0,0.72) 100%
+        );
+
+    box-shadow:
+        inset 0 0 140px rgba(0,0,0,0.85);
+}
