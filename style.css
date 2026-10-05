@@ -740,110 +740,223 @@ body {
         auto,
         auto;
 }
-/* ===== REAL PARTY STAGE LIGHTS ===== */
+/* ================================
+   PARTY CHAOS - STAGE LIGHTS
+   ================================ */
 
 .background {
     position: fixed;
     inset: 0;
+    width: 100%;
+    height: 100%;
     overflow: hidden;
-    pointer-events: none;
     z-index: 0;
+    pointer-events: none;
+
     background:
-        radial-gradient(
-            ellipse at 50% 45%,
-            rgba(110, 50, 220, 0.20),
-            transparent 48%
-        );
+        radial-gradient(circle at 50% 100%,
+            rgba(255, 0, 180, 0.20),
+            transparent 45%),
+        radial-gradient(circle at 50% 30%,
+            rgba(80, 0, 255, 0.25),
+            transparent 60%),
+        #090014;
 }
 
-/* Scheinwerfer */
+/* große echte Lichtkegel */
+
 .background .light {
     position: absolute;
-    top: -35%;
-    width: 45vw;
+    width: 30vw;
     height: 150vh;
-    opacity: 0.32;
+
+    top: -20vh;
+
     filter: blur(18px);
+    opacity: 0.65;
+
     transform-origin: 50% 0%;
+
     mix-blend-mode: screen;
+
+    border-radius: 50%;
+
+    pointer-events: none;
 }
 
-/* linker Scheinwerfer */
+/* linker Lichtkegel */
+
 .background .light-1 {
-    left: -12%;
+    left: -5vw;
+
     background: linear-gradient(
-        105deg,
-        transparent 0%,
-        transparent 35%,
-        rgba(150, 60, 255, 0.75) 50%,
-        transparent 68%,
-        transparent 100%
+        180deg,
+        rgba(0, 180, 255, 0.75),
+        rgba(0, 180, 255, 0.30) 40%,
+        transparent 85%
     );
-    animation: spotlightLeft 7s ease-in-out infinite alternate;
+
+    transform: rotate(-25deg);
+
+    animation: spotlightLeft 5s ease-in-out infinite alternate;
 }
 
-/* mittlerer Scheinwerfer */
+/* mittlerer Lichtkegel */
+
 .background .light-2 {
-    left: 28%;
+    left: 35vw;
+
     background: linear-gradient(
-        105deg,
-        transparent 0%,
-        transparent 36%,
-        rgba(255, 40, 180, 0.65) 50%,
-        transparent 64%,
-        transparent 100%
+        180deg,
+        rgba(255, 0, 220, 0.80),
+        rgba(255, 0, 220, 0.30) 45%,
+        transparent 85%
     );
-    animation: spotlightMiddle 8s ease-in-out infinite alternate;
+
+    transform: rotate(0deg);
+
+    animation: spotlightMiddle 4s ease-in-out infinite alternate;
 }
 
-/* rechter Scheinwerfer */
+/* rechter Lichtkegel */
+
 .background .light-3 {
-    right: -12%;
+    right: -5vw;
+
     background: linear-gradient(
-        75deg,
-        transparent 0%,
-        transparent 35%,
-        rgba(30, 160, 255, 0.70) 50%,
-        transparent 68%,
-        transparent 100%
+        180deg,
+        rgba(255, 230, 0, 0.75),
+        rgba(255, 100, 0, 0.25) 45%,
+        transparent 85%
     );
-    animation: spotlightRight 6.5s ease-in-out infinite alternate;
+
+    transform: rotate(25deg);
+
+    animation: spotlightRight 6s ease-in-out infinite alternate;
 }
 
 
-/* Licht bewegt sich nach links/rechts */
+/* ================================
+   BEWEGUNG
+   ================================ */
 
 @keyframes spotlightLeft {
+
     0% {
-        transform: rotate(-25deg) scale(1);
+        transform: rotate(-35deg) translateX(-5vw);
+        opacity: 0.35;
+    }
+
+    50% {
+        opacity: 0.75;
     }
 
     100% {
-        transform: rotate(18deg) scale(1.08);
+        transform: rotate(5deg) translateX(15vw);
+        opacity: 0.55;
     }
 }
+
 
 @keyframes spotlightMiddle {
+
     0% {
-        transform: rotate(12deg) scale(1);
+        transform: rotate(-15deg);
+        opacity: 0.35;
+    }
+
+    50% {
+        transform: rotate(15deg);
+        opacity: 0.80;
     }
 
     100% {
-        transform: rotate(-12deg) scale(1.08);
+        transform: rotate(-5deg);
+        opacity: 0.50;
     }
 }
+
 
 @keyframes spotlightRight {
+
     0% {
-        transform: rotate(25deg) scale(1);
+        transform: rotate(35deg) translateX(5vw);
+        opacity: 0.40;
+    }
+
+    50% {
+        opacity: 0.80;
     }
 
     100% {
-        transform: rotate(-18deg) scale(1.08);
+        transform: rotate(-5deg) translateX(-15vw);
+        opacity: 0.55;
     }
 }
 
 
+/* ================================
+   LICHTQUELLE HINTER DEM LOGO
+   ================================ */
+
+.neon-light {
+    position: fixed;
+
+    width: 70vw;
+    height: 70vw;
+
+    left: 50%;
+    top: 42%;
+
+    transform: translate(-50%, -50%);
+
+    background: radial-gradient(
+        circle,
+        rgba(255, 0, 200, 0.35) 0%,
+        rgba(120, 0, 255, 0.20) 30%,
+        transparent 70%
+    );
+
+    filter: blur(35px);
+
+    z-index: 1;
+
+    pointer-events: none;
+
+    animation: logoLight 2.5s ease-in-out infinite alternate;
+}
+
+
+@keyframes logoLight {
+
+    from {
+        opacity: 0.45;
+        transform: translate(-50%, -50%) scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.1);
+    }
+}
+
+
+/* dunkler Rand = mehr Bühne/Tiefe */
+
+body::after {
+    content: "";
+
+    position: fixed;
+    inset: 0;
+
+    pointer-events: none;
+
+    z-index: 3;
+
+    box-shadow:
+        inset 0 0 120px rgba(0,0,0,0.75),
+        inset 0 -100px 150px rgba(0,0,0,0.45);
+}
 /* Lichtschein direkt hinter dem Logo */
 
 .neon-light {
