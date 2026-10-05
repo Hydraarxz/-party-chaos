@@ -195,3 +195,56 @@ body::before {
             rgba(255,255,255,0.45)
         );
 }
+.burst-particle {
+    position: fixed;
+
+    width: 6px;
+    height: 6px;
+
+    border-radius: 2px;
+
+    pointer-events: none;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ffffff,
+            #c88cff
+        );
+
+    box-shadow:
+        0 0 10px
+        rgba(190,120,255,.8);
+
+    z-index: 100;
+
+    animation:
+        burst .65s
+        cubic-bezier(.2,.8,.3,1)
+        forwards;
+}
+
+@keyframes burst {
+
+    0% {
+        opacity: 1;
+
+        transform:
+            translate3d(0,0,0)
+            rotate(0deg)
+            scale(1);
+    }
+
+    100% {
+        opacity: 0;
+
+        transform:
+            translate3d(
+                var(--dx),
+                var(--dy),
+                0
+            )
+            rotate(180deg)
+            scale(.2);
+    }
+}
