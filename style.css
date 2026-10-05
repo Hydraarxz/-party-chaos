@@ -1592,3 +1592,164 @@ body::after {
             rgba(0,0,0,0.60) 100%
         );
 }
+/* ===== PARTY CHAOS - NEW BACKGROUND ===== */
+
+html,
+body {
+    background: #020107 !important;
+}
+
+/* kompletter Bühnenraum */
+.background {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 0 !important;
+
+    background-color: #05030b !important;
+
+    background-image:
+        /* obere Lichtquellen */
+        radial-gradient(
+            circle at 18% 12%,
+            rgba(0, 170, 255, 0.28) 0px,
+            rgba(0, 170, 255, 0.08) 90px,
+            transparent 230px
+        ),
+
+        radial-gradient(
+            circle at 82% 12%,
+            rgba(255, 0, 170, 0.28) 0px,
+            rgba(255, 0, 170, 0.08) 90px,
+            transparent 230px
+        ),
+
+        radial-gradient(
+            circle at 50% 18%,
+            rgba(150, 0, 255, 0.20),
+            transparent 300px
+        ),
+
+        /* dunkle Bühne */
+        linear-gradient(
+            180deg,
+            #020207 0%,
+            #080511 38%,
+            #11091a 68%,
+            #030207 100%
+        ) !important;
+
+    overflow: hidden !important;
+}
+
+
+/* ===== SEITLICHE BÜHNENWÄNDE ===== */
+
+.background::before {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    background:
+        /* linke Wand */
+        linear-gradient(
+            90deg,
+            rgba(0,0,0,0.95) 0%,
+            rgba(12,8,22,0.75) 10%,
+            transparent 27%
+        ),
+
+        /* rechte Wand */
+        linear-gradient(
+            270deg,
+            rgba(0,0,0,0.95) 0%,
+            rgba(12,8,22,0.75) 10%,
+            transparent 27%
+        ),
+
+        /* dunkle Decke */
+        linear-gradient(
+            180deg,
+            rgba(0,0,0,0.90),
+            transparent 35%
+        );
+
+    pointer-events: none;
+}
+
+
+/* ===== BÜHNENBODEN ===== */
+
+.background::after {
+    content: "";
+
+    position: absolute;
+
+    left: -10%;
+    width: 120%;
+    bottom: -5%;
+
+    height: 38%;
+
+    background:
+        /* Bodenlinien */
+        repeating-linear-gradient(
+            90deg,
+            transparent 0px,
+            transparent 95px,
+            rgba(170,80,255,0.10) 96px,
+            transparent 98px
+        ),
+
+        /* Lichtreflexion */
+        radial-gradient(
+            ellipse at 50% 0%,
+            rgba(180,0,255,0.30),
+            transparent 55%
+        ),
+
+        linear-gradient(
+            180deg,
+            rgba(40,20,55,0.75),
+            rgba(2,1,5,0.98)
+        );
+
+    transform: perspective(500px) rotateX(55deg);
+    transform-origin: center bottom;
+
+    border-top: 1px solid rgba(200,100,255,0.15);
+
+    box-shadow:
+        0 -30px 80px rgba(150,0,255,0.20);
+
+    pointer-events: none;
+}
+
+
+/* ===== DUNKLE ECKEN ===== */
+
+body::after {
+    content: "";
+
+    position: fixed;
+    inset: 0;
+
+    z-index: 5;
+
+    pointer-events: none;
+
+    background:
+        radial-gradient(
+            ellipse at center,
+            transparent 30%,
+            rgba(0,0,0,0.25) 65%,
+            rgba(0,0,0,0.85) 100%
+        ) !important;
+}
+
+
+/* Lichtkegel über dem Raum */
+
+.background .light {
+    z-index: 2 !important;
+}
