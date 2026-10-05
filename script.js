@@ -160,3 +160,199 @@ setInterval(
     createParticle,
     250
 );
+/* =====================================
+   INTERAKTIVE PARTY-CHAOS BUCHSTABEN
+===================================== */
+
+const letters =
+    document.querySelectorAll(".logo-word span");
+
+let draggedLetter = null;
+
+let startX = 0;
+let startY = 0;
+
+let currentX = 0;
+let currentY = 0;
+
+
+/* Buchstabe wird angefasst */
+
+letters.forEach(letter => {
+
+    letter.addEventListener(
+        "pointerdown",
+        startDrag
+    );
+
+});
+
+
+function startDrag(event) {
+
+    event.preventDefault();
+
+    draggedLetter = event.currentTarget;
+
+    draggedLetter.setPointerCapture(
+        event.pointerId
+    );
+
+    startX = event.clientX;
+    startY = event.clientY;
+
+    currentX =
+        parseFloat(
+            draggedLetter.dataset.x || 0
+        );
+
+    currentY =
+        parseFloat(
+            draggedLetter.dataset.y || 0
+        );
+
+    draggedLetter.style.transition =
+        "none";
+
+    draggedLetter.addEventListener(
+        "pointermove",
+        dragLetter
+    );
+
+    draggedLetter.addEventListener(
+        "pointerup",
+        stopDrag
+    );
+
+    draggedLetter.addEventListener(
+        "pointercancel",
+        stopDrag
+    );
+}
+
+
+/* Buchstabe bewegen */
+
+function dragLetter(event) {
+
+    if (!draggedLetter) return;
+
+    const movementX =
+        event.clientX - startX;
+
+    const movementY =
+        event.clientY - startY;
+
+
+    const newX =
+        currentX + movementX;
+
+    const newY =
+        currentY + movementY;
+
+
+    /*
+       Je schneller/weiter man zieht,
+       desto stärker dreht sich der Buchstabe
+    */
+
+    const rotation =
+        Math.max(
+            -25,
+            Math.min(
+                25,
+                movementX * 0.18
+            )
+        );
+
+
+    draggedLetter.style.setProperty(
+        "--drag-x",
+        newX + "px"
+    );
+
+    draggedLetter.style.setProperty(
+        "--drag-y",
+        newY + "px"
+    );
+
+    draggedLetter.style.setProperty(
+        "--drag-rotation",
+        rotation + "deg"
+    );
+
+
+    draggedLetter.dataset.x =
+        newX;
+
+    draggedLetter.dataset.y =
+        newY;
+}
+
+
+/* Loslassen */
+
+function stopDrag(event) {
+
+    if (!draggedLetter) return;
+
+
+    draggedLetter.releasePointerCapture(
+        event.pointerId
+    );
+
+
+    draggedLetter.style.transition =
+        "transform 0.55s cubic-bezier(.2,1.6,.4,1)";
+
+
+    /*
+       leicht zurückfedern,
+       aber nicht komplett auf
+       die ursprüngliche Position
+    */
+
+    const x =
+        parseFloat(
+            draggedLetter.dataset.x || 0
+        );
+
+    const y =
+        parseFloat(
+            draggedLetter.dataset.y || 0
+        );
+
+
+    draggedLetter.style.setProperty(
+        "--drag-x",
+        (x * 0.45) + "px"
+    );
+
+    draggedLetter.style.setProperty(
+        "--drag-y",
+        (y * 0.45) + "px"
+    );
+
+    draggedLetter.style.setProperty(
+        "--drag-rotation",
+        "0deg"
+    );
+
+
+    draggedLetter.removeEventListener(
+        "pointermove",
+        dragLetter
+    );
+
+    draggedLetter.removeEventListener(
+        "pointerup",
+        stopDrag
+    );
+
+    draggedLetter.removeEventListener(
+        "pointercancel",
+        stopDrag
+    );
+
+    draggedLetter = null;
+}
