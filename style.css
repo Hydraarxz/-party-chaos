@@ -558,3 +558,185 @@ body {
         font-size: 18px;
     }
 }
+/* =========================================
+   PARTY CHAOS – REALISTIC PARTY BACKGROUND
+   ========================================= */
+
+body {
+    background:
+        radial-gradient(
+            ellipse at 50% 42%,
+            rgba(125, 55, 255, 0.20) 0%,
+            rgba(50, 20, 100, 0.12) 28%,
+            transparent 55%
+        ),
+        radial-gradient(
+            ellipse at 15% 75%,
+            rgba(255, 25, 150, 0.12),
+            transparent 38%
+        ),
+        radial-gradient(
+            ellipse at 85% 70%,
+            rgba(0, 170, 255, 0.12),
+            transparent 38%
+        ),
+        linear-gradient(
+            180deg,
+            #08070d 0%,
+            #100b1d 48%,
+            #05050a 100%
+        );
+}
+
+
+/* Große bewegliche Lichtwolken */
+body::before {
+    content: "";
+    position: fixed;
+    inset: -35%;
+    pointer-events: none;
+    z-index: 0;
+
+    background:
+        radial-gradient(
+            ellipse at 25% 15%,
+            rgba(190, 70, 255, 0.18) 0%,
+            transparent 25%
+        ),
+        radial-gradient(
+            ellipse at 75% 18%,
+            rgba(0, 190, 255, 0.15) 0%,
+            transparent 25%
+        ),
+        radial-gradient(
+            ellipse at 50% 65%,
+            rgba(255, 40, 170, 0.12) 0%,
+            transparent 32%
+        );
+
+    filter: blur(45px);
+
+    animation: partyClouds 12s ease-in-out infinite alternate;
+}
+
+
+/* Haupt-Lichtkegel hinter PARTY CHAOS */
+body::after {
+    content: "";
+    position: fixed;
+    left: 50%;
+    top: 35%;
+
+    width: 75vw;
+    height: 100vh;
+
+    transform:
+        translate(-50%, -10%)
+        rotate(-3deg);
+
+    pointer-events: none;
+    z-index: 1;
+
+    background:
+        conic-gradient(
+            from 175deg at 50% 0%,
+            transparent 0deg,
+            rgba(170, 70, 255, 0.00) 20deg,
+            rgba(180, 70, 255, 0.13) 35deg,
+            rgba(255, 70, 220, 0.10) 48deg,
+            rgba(80, 160, 255, 0.12) 62deg,
+            transparent 82deg
+        );
+
+    filter: blur(28px);
+
+    opacity: 0.85;
+
+    animation: neonCone 6s ease-in-out infinite alternate;
+}
+
+
+/* Bewegungen der Lichtwolken */
+@keyframes partyClouds {
+
+    0% {
+        transform:
+            translate(-3%, -2%)
+            scale(1);
+    }
+
+    50% {
+        transform:
+            translate(3%, 2%)
+            scale(1.06);
+    }
+
+    100% {
+        transform:
+            translate(-2%, 4%)
+            scale(1.02);
+    }
+}
+
+
+/* Langsames Schwenken des Lichtkegels */
+@keyframes neonCone {
+
+    0% {
+        transform:
+            translate(-50%, -10%)
+            rotate(-8deg)
+            scale(0.95);
+
+        opacity: 0.55;
+    }
+
+    50% {
+        opacity: 0.9;
+    }
+
+    100% {
+        transform:
+            translate(-50%, -10%)
+            rotate(8deg)
+            scale(1.08);
+
+        opacity: 0.7;
+    }
+}
+
+
+/* Dunkler Bühnenrand für mehr Tiefe */
+body {
+    box-shadow:
+        inset 0 0 180px rgba(0,0,0,0.75);
+}
+
+
+/* Kleine Lichtpunkte im Hintergrund */
+body {
+    background-image:
+        radial-gradient(circle at 12% 18%, rgba(255,255,255,0.08) 0 1px, transparent 2px),
+        radial-gradient(circle at 82% 25%, rgba(255,255,255,0.06) 0 1px, transparent 2px),
+        radial-gradient(circle at 20% 72%, rgba(255,255,255,0.05) 0 1px, transparent 2px),
+        radial-gradient(circle at 76% 68%, rgba(255,255,255,0.05) 0 1px, transparent 2px),
+        radial-gradient(
+            ellipse at 50% 42%,
+            rgba(125,55,255,0.20),
+            transparent 55%
+        ),
+        linear-gradient(
+            180deg,
+            #08070d 0%,
+            #100b1d 48%,
+            #05050a 100%
+        );
+
+    background-size:
+        260px 260px,
+        340px 340px,
+        420px 420px,
+        300px 300px,
+        auto,
+        auto;
+}
