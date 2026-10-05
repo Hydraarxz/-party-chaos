@@ -1753,3 +1753,315 @@ body::after {
 .background .light {
     z-index: 2 !important;
 }
+/* =========================================
+   3D PARTY STAGE
+========================================= */
+
+.stage-objects {
+    position: fixed;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    overflow: hidden;
+    perspective: 1000px;
+}
+
+/* ---------- METALL-TRUSS ---------- */
+
+.truss {
+    position: absolute;
+    background:
+        linear-gradient(
+            90deg,
+            #111 0%,
+            #454545 25%,
+            #151515 50%,
+            #555 75%,
+            #101010 100%
+        );
+    border: 2px solid #090909;
+    box-shadow:
+        0 5px 15px rgba(0,0,0,.7),
+        inset 0 1px rgba(255,255,255,.15);
+}
+
+.truss-top {
+    width: 82%;
+    height: 22px;
+    left: 9%;
+    top: 7%;
+    transform: rotateX(12deg);
+}
+
+.truss-left {
+    width: 18px;
+    height: 45%;
+    left: 9%;
+    top: 7%;
+}
+
+.truss-right {
+    width: 18px;
+    height: 45%;
+    right: 9%;
+    top: 7%;
+}
+
+/* diagonale Streben */
+
+.truss-top::before,
+.truss-top::after {
+    content: "";
+    position: absolute;
+    top: 2px;
+    width: 100%;
+    height: 3px;
+    background: #777;
+}
+
+.truss-top::before {
+    transform: rotate(12deg);
+}
+
+.truss-top::after {
+    transform: rotate(-12deg);
+}
+
+
+/* ---------- SPOTLIGHTS ---------- */
+
+.stage-light {
+    position: absolute;
+    width: 58px;
+    height: 38px;
+    background: linear-gradient(
+        145deg,
+        #555,
+        #181818 45%,
+        #080808
+    );
+    border: 2px solid #090909;
+    border-radius: 8px;
+    box-shadow: 0 8px 18px rgba(0,0,0,.7);
+    transform: rotateX(15deg);
+}
+
+.stage-light::after {
+    content: "";
+    position: absolute;
+    width: 20px;
+    height: 12px;
+    left: 18px;
+    bottom: -8px;
+    background: #111;
+    border-radius: 50%;
+}
+
+.lamp {
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    right: 5px;
+    top: 5px;
+    border-radius: 50%;
+    background: #eee;
+    box-shadow:
+        0 0 8px white,
+        0 0 25px rgba(180,180,255,.9);
+}
+
+.stage-light-1 {
+    left: 25%;
+    top: 8%;
+}
+
+.stage-light-2 {
+    left: 48%;
+    top: 8%;
+}
+
+.stage-light-3 {
+    right: 25%;
+    top: 8%;
+}
+
+
+/* ---------- LAUTSPRECHER ---------- */
+
+.speaker {
+    position: absolute;
+    width: 145px;
+    height: 245px;
+    bottom: 10%;
+    background:
+        linear-gradient(
+            145deg,
+            #242424,
+            #090909 55%,
+            #020202
+        );
+    border: 3px solid #050505;
+    border-radius: 8px;
+    box-shadow:
+        0 25px 45px rgba(0,0,0,.8),
+        inset 8px 0 15px rgba(255,255,255,.04);
+}
+
+/* Tiefe Seitenfläche */
+
+.speaker::before {
+    content: "";
+    position: absolute;
+    width: 18px;
+    height: 100%;
+    right: -20px;
+    top: 8px;
+    background: #080808;
+    transform: skewY(-25deg);
+    transform-origin: left;
+}
+
+/* obere Kante */
+
+.speaker-top {
+    position: absolute;
+    width: 100%;
+    height: 15px;
+    top: -14px;
+    left: 5px;
+    background: #303030;
+    transform: skewX(-20deg);
+    border-radius: 4px;
+}
+
+.speaker-left {
+    left: 7%;
+    transform:
+        perspective(700px)
+        rotateY(10deg)
+        rotateZ(-1deg);
+}
+
+.speaker-right {
+    right: 7%;
+    transform:
+        perspective(700px)
+        rotateY(-10deg)
+        rotateZ(1deg);
+}
+
+.speaker-grille {
+    position: absolute;
+    inset: 18px;
+    background:
+        radial-gradient(circle, #333 1px, transparent 1px);
+    background-size: 7px 7px;
+    border: 2px solid #111;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+/* Lautsprecher-Membranen */
+
+.speaker-driver {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    background:
+        radial-gradient(
+            circle,
+            #292929 0%,
+            #111 45%,
+            #050505 70%
+        );
+    border: 5px solid #050505;
+    box-shadow:
+        inset 0 0 12px #000,
+        0 3px 8px #000;
+}
+
+.speaker-driver.big {
+    width: 82px;
+    height: 82px;
+    top: 82px;
+}
+
+.speaker-driver.small {
+    width: 48px;
+    height: 48px;
+    top: 22px;
+}
+
+
+/* ---------- BÜHNENBODEN ---------- */
+
+.stage-floor {
+    position: absolute;
+    width: 115%;
+    height: 42%;
+    left: -7%;
+    bottom: -20%;
+    background:
+        repeating-linear-gradient(
+            90deg,
+            rgba(255,255,255,.035) 0 2px,
+            transparent 2px 90px
+        ),
+        linear-gradient(
+            180deg,
+            #242424,
+            #080808
+        );
+    transform:
+        perspective(500px)
+        rotateX(62deg);
+    transform-origin: top;
+    box-shadow:
+        0 -20px 50px rgba(0,0,0,.8);
+}
+
+/* Bühnenkante */
+
+.stage-floor::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 12px;
+    top: 0;
+    left: 0;
+    background: linear-gradient(
+        90deg,
+        #111,
+        #555,
+        #111
+    );
+    box-shadow: 0 0 25px rgba(180,180,255,.25);
+}
+
+
+/* ---------- NEBEL ---------- */
+
+.stage-haze {
+    position: absolute;
+    width: 100%;
+    height: 35%;
+    bottom: 0;
+    left: 0;
+    background:
+        radial-gradient(
+            ellipse,
+            rgba(190,190,255,.08),
+            transparent 65%
+        );
+    filter: blur(18px);
+    opacity: .8;
+}
+
+
+/* ---------- MENU ÜBER ALLEM ---------- */
+
+.menu {
+    position: relative;
+    z-index: 10;
+}
