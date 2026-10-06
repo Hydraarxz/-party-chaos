@@ -237,3 +237,21 @@ v    // 1. Szene & Düsterer Nebel (Blutrot / Dunkelviolett)
     createSpotlight(-4, 6, 1, 0x00ff66); // Giftgrün
     createSpotlight(0, 6.5, 1, 0xff0044);  // Blutrot
     createSpotlight(4, 6, 1, 0x00ccff);  // Cyan
+function animate() {
+    requestAnimationFrame(animate);
+
+    const time = performance.now() * 0.002;
+    
+    // Zitternde Kamera (Horror-Kamera-Gewackel)
+    camera.position.x = Math.sin(time * 0.5) * 0.15;
+    camera.position.y = 2.5 + Math.cos(time * 0.8) * 0.08;
+    camera.lookAt(0, 2, 0);
+
+    // Leichtes Flackern der Lichter wie bei alten Discolichtern
+    if (lights.length > 0) {
+        lights[0].intensity = 70 + Math.sin(time * 10) * 20;
+        lights[1].intensity = 80 + Math.cos(time * 15) * 25;
+    }
+
+    renderer.render(scene, camera);
+}
