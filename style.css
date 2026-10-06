@@ -8,7 +8,7 @@
 }
 
 body {
-    background-color: #08080a;
+    background-color: #030305;
     color: #f0f0f5;
     font-family: 'Plus Jakarta Sans', sans-serif;
     overflow: hidden;
@@ -16,7 +16,7 @@ body {
     width: 100vw;
 }
 
-/* 3D / Canvas im Hintergrund */
+/* 3D Canvas */
 #stage3d {
     position: fixed;
     inset: 0;
@@ -25,7 +25,7 @@ body {
     z-index: 1;
 }
 
-/* UI-Container links platziert */
+/* UI Container Links */
 .ui-container {
     position: absolute;
     left: 8vw;
@@ -36,9 +36,14 @@ body {
     flex-direction: column;
     align-items: flex-start;
     max-width: 450px;
+    pointer-events: none; /* Macht den Klick durch auf den Canvas möglich */
 }
 
-/* LOGO: Clean, hoch & massiv */
+.ui-container * {
+    pointer-events: auto;
+}
+
+/* LOGO */
 .logo-group {
     position: relative;
     margin-bottom: 40px;
@@ -52,8 +57,8 @@ body {
     text-transform: uppercase;
     color: #ffffff;
     text-shadow: 
-        2px 2px 0px rgba(0, 0, 0, 0.8),
-        0 0 30px rgba(255, 255, 255, 0.15);
+        3px 3px 0px rgba(0, 0, 0, 0.9),
+        0 0 25px rgba(255, 255, 255, 0.2);
 }
 
 /* MENÜLISTE */
