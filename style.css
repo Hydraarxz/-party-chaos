@@ -49,3 +49,173 @@
 .chaos-button {
     width: 100%;
 }
+@import url('https://fonts.googleapis.com/css2?family=Creepster&family=Montserrat:wght@900&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    user-select: none;
+}
+
+body {
+    background-color: #030106;
+    color: #fff;
+    font-family: 'Montserrat', sans-serif;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+}
+
+/* 3D Canvas im Hintergrund */
+#stage3d {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1;
+    display: block;
+}
+
+/* Menü Container */
+.menu {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: min(700px, 90vw);
+    text-align: center;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* LOOGO: Schief, bedrohlich & neon-glühend */
+.logo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transform: rotate(-3deg);
+    filter: drop-shadow(0 0 20px rgba(186, 0, 255, 0.6));
+}
+
+.logo-word {
+    font-family: 'Creepster', cursive; /* Spukiger Horror-Font */
+    font-size: clamp(3.5rem, 10vw, 6.5rem);
+    letter-spacing: 6px;
+    line-height: 0.9;
+    text-shadow: 
+        0 0 10px #ff0055,
+        0 0 20px #ff0055,
+        0 0 40px #aa00ff;
+    animation: jitter 3s infinite alternate;
+}
+
+.logo-word.party {
+    color: #ff2a70;
+}
+
+.logo-word.chaos {
+    color: #00ffcc;
+    font-size: clamp(4rem, 12vw, 7.5rem);
+    transform: rotate(5deg) translateY(-10px);
+    text-shadow: 
+        0 0 10px #00ffcc,
+        0 0 25px #00ffcc,
+        0 0 50px #0088ff;
+}
+
+/* Untertitel wie eine Warnung */
+.subtitle {
+    font-size: 0.9rem;
+    font-weight: 900;
+    letter-spacing: 5px;
+    color: #ff3300;
+    margin: 25px 0 35px;
+    text-transform: uppercase;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 6px 16px;
+    border: 1px solid #ff3300;
+    box-shadow: 0 0 15px rgba(255, 51, 0, 0.4);
+    transform: rotate(-1deg);
+}
+
+/* BUTTONS im Jackbox-Monster-Style */
+.menu-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: min(320px, 85vw);
+}
+
+.chaos-button {
+    background: #0d0614;
+    border: 3px solid #00ffcc;
+    color: #00ffcc;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 900;
+    padding: 16px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    position: relative;
+    box-shadow: 
+        0 0 15px rgba(0, 255, 204, 0.3),
+        inset 0 0 10px rgba(0, 255, 204, 0.2);
+    transition: all 0.15s ease-in-out;
+    transform: skewX(-4deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.chaos-button.create {
+    border-color: #00ffcc;
+    color: #00ffcc;
+}
+
+.chaos-button.join {
+    border-color: #ff0055;
+    color: #ff0055;
+    box-shadow: 
+        0 0 15px rgba(255, 0, 85, 0.3),
+        inset 0 0 10px rgba(255, 0, 85, 0.2);
+    transform: skewX(3deg);
+}
+
+/* Hover-Effekte: Aggressiver Glow & Vibration */
+.chaos-button:hover {
+    transform: scale(1.06) skewX(0deg);
+    background: #180a28;
+}
+
+.chaos-button.create:hover {
+    box-shadow: 0 0 30px #00ffcc, inset 0 0 15px #00ffcc;
+    color: #fff;
+    text-shadow: 0 0 8px #00ffcc;
+}
+
+.chaos-button.join:hover {
+    box-shadow: 0 0 30px #ff0055, inset 0 0 15px #ff0055;
+    color: #fff;
+    text-shadow: 0 0 8px #ff0055;
+}
+
+/* Versionstext unten */
+.version {
+    margin-top: 40px;
+    font-size: 0.75rem;
+    color: #66527a;
+    letter-spacing: 2px;
+}
+
+/* Zitter-Animation für das Logo */
+@keyframes jitter {
+    0% { transform: rotate(-3deg) translate(0, 0); }
+    25% { transform: rotate(-2.5deg) translate(1px, -1px); }
+    50% { transform: rotate(-3.5deg) translate(-1px, 1px); }
+    75% { transform: rotate(-2.8deg) translate(2px, 0); }
+    100% { transform: rotate(-3.2deg) translate(-1px, -1px); }
+}
