@@ -9,21 +9,23 @@ animate();
 
 function init() {
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x05050a);
-    scene.fog = new THREE.FogExp2(0x05050a, 0.04);
+    scene.background = new THREE.Color(0x040407);
+    scene.fog = new THREE.FogExp2(0x040407, 0.035);
 
     camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
-    camera.position.set(0, 1.8, 9);
+    camera.position.set(0, 1.6, 8.5);
 
     const canvas = document.getElementById("stage3d");
-    renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+    renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: false });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.1;
 
     setupLighting();
-    createFloor();
-    createCrate();
-    createWindowAndRain();
+    createProceduralRealisticFloor();
+    createGroundedDetailedCrate();
+    createLargeAtmosphericWindow();
 
     window.addEventListener("mousemove", (e) => {
         mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
@@ -34,160 +36,71 @@ function init() {
 }
 
 function setupLighting() {
-    const ambientLight = new THREE.AmbientLight(0x33334e, 1.5);
+    // Sanftes, düsteres Raumlicht
+    const ambientLight = new THREE.AmbientLight(0x222538, 1.2);
     scene.add(ambientLight);
 
-    const spotLight = new THREE.SpotLight(0xffb066, 180, 18, Math.PI / 3, 0.5);
-    spotLight.position.set(4, 5, 4);
-    spotLight.target.position.set(2, 0, 0);
-    scene.add(spotLight);
-    scene.add(spotLight.target);
+    // Hauptlicht: Warmes Licht, das atmosphärisch über den Dielenboden streift
+    const warmSpot = new THREE.SpotLight(0xffb866, 180, 18, Math.PI / 3.5, 0.6);
+    warmSpot.position.set(-3.5, 4.5, 4);
+    warmSpot.target.position.set(0, -1.2, 0);
+    scene.add(warmSpot);
+    scene.add(warmSpot.target);
 
-    lightningLight = new THREE.PointLight(0x77b8ff, 0, 35);
-    lightningLight.position.set(2.5, 3, -5);
+    // Kisten-Spotlight
+    const boxSpot = new THREE.SpotLight(0xffaa55, 120, 12, Math.PI / 4, 0.5);
+    boxSpot.position.set(3, 4, 3);
+    boxSpot.target.position.set(2, -1.2, 0);
+    scene.add(boxSpot);
+    scene.add(boxSpot.target);
+
+    // Blitzeffekt aus dem Fenster
+    lightningLight = new THREE.PointLight(0x88ccff, 0, 30);
+    lightningLight.position.set(1.5, 2.5, -4.5);
     scene.add(lightningLight);
 }
 
-/* 1. HOLZBODEN */
-function createFloor() {
+/* 1. EDLER, REALISTISCHER DIELENBODEN (WIE IN BILD 2) */
+function createProceduralRealisticFloor() {
     const floorGroup = new THREE.Group();
 
-    const floorGeo = new THREE.PlaneGeometry(30, 20);
-    const floorMat = new THREE.MeshStandardMaterial({
-        color: 0x3d2312,
-        roughness: 0.4,
-        metalness: 0.1
-    });
-    const floor = new THREE.Mesh(floorGeo, floorMat);
-    floor.rotation.x = -Math.PI / 2;
-    floor.position.y = -1.2;
-    floorGroup.add(floor);
+    // Dunkler Untergrund für die Rillen zwischen den Dielen
+    const baseGeo = new THREE.PlaneGeometry(30, 20);
+    const baseMat = new THREE.MeshStandardMaterial({ color: 0x050302, roughness: 1.0 });
+    const base = new THREE.Mesh(baseGeo, baseMat);
+    base.rotation.x = -Math.PI / 2;
+    base.position.y = -1.25;
+    floorGroup.add(base);
 
-    const grid = new THREE.GridHelper(30, 30, 0x1f1209, 0x1f1209);
-    grid.position.y = -1.19;
-    floorGroup.add(grid);
-
-    scene.add(floorGroup);
-}
-
-/* 2. KISTE */
-function createCrate() {
-    partyBoxGroup = new THREE.Group();
-
-    const boxGeo = new THREE.BoxGeometry(2.2, 2.2, 2.2);
-    const boxMat = new THREE.MeshStandardMaterial({
-        color: 0x6e401f,
-        roughness: 0.5
-    });
-    const mainBox = new THREE.Mesh(boxGeo, boxMat);
-    partyBoxGroup.add(mainBox);
-
-    const metalMat = new THREE.MeshStandardMaterial({ color: 0x22222a, roughness: 0.3, metalness: 0.8 });
-    const cornerGeo = new THREE.BoxGeometry(0.35, 0.35, 0.35);
-
-    [-1, 1].forEach(x => {
-        [-1, 1].forEach(y => {
-            [-1, 1].forEach(z => {
-                const corner = new THREE.Mesh(cornerGeo, metalMat);
-                corner.position.set(x * 1.1, y * 1.1, z * 1.1);
-                partyBoxGroup.add(corner);
-            });
-        });
-    });
-
-    const frameMat = new THREE.MeshStandardMaterial({ color: 0x4a2b15, roughness: 0.6 });
-    const diagGeo = new THREE.BoxGeometry(2.6, 0.25, 0.08);
-    const diagPlank = new THREE.Mesh(diagGeo, frameMat);
-    diagPlank.position.z = 1.12;
-    diagPlank.rotation.z = Math.PI / 4;
-    partyBoxGroup.add(diagPlank);
-
-    partyBoxGroup.position.set(2.4, -0.1, -0.2);
-    partyBoxGroup.rotation.set(0.25, -0.65, 0.12);
-
-    scene.add(partyBoxGroup);
-}
-
-/* 3. FENSTER & REGEN */
-function createWindowAndRain() {
-    const windowGroup = new THREE.Group();
-
-    const frameGeo = new THREE.BoxGeometry(4.5, 3.2, 0.2);
-    const frameMat = new THREE.MeshStandardMaterial({ color: 0x121218, roughness: 0.8 });
-    const windowFrame = new THREE.Mesh(frameGeo, frameMat);
-    windowGroup.add(windowFrame);
-
-    const barMat = new THREE.MeshStandardMaterial({ color: 0x1a1a24, roughness: 0.8 });
-    const vertBar = new THREE.Mesh(new THREE.BoxGeometry(0.12, 3.2, 0.22), barMat);
-    const horizBar = new THREE.Mesh(new THREE.BoxGeometry(4.5, 0.12, 0.22), barMat);
-    windowGroup.add(vertBar);
-    windowGroup.add(horizBar);
-
-    windowGroup.position.set(2.5, 2.8, -5);
-    scene.add(windowGroup);
-
-    const rainCount = 600;
-    const rainGeo = new THREE.BufferGeometry();
-    const rainPos = new Float32Array(rainCount * 3);
-
-    for (let i = 0; i < rainCount * 3; i += 3) {
-        rainPos[i] = 2.5 + (Math.random() - 0.5) * 6;
-        rainPos[i + 1] = Math.random() * 5 + 1;
-        rainPos[i + 2] = -5.5 + (Math.random() - 0.5) * 1.5;
+    // Generiere Textur per Canvas für Holzmaserung & Glanz
+    const canvas = document.createElement('canvas');
+    canvas.width = 512;
+    canvas.height = 512;
+    const ctx = canvas.getContext('2d');
+    
+    // Grundfarbe & Maserung zeichnen
+    ctx.fillStyle = '#3a2012';
+    ctx.fillRect(0, 0, 512, 512);
+    for (let i = 0; i < 800; i++) {
+        ctx.fillStyle = Math.random() > 0.5 ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.04)';
+        const y = Math.random() * 512;
+        const h = Math.random() * 4 + 1;
+        ctx.fillRect(0, y, 512, h);
     }
 
-    rainGeo.setAttribute('position', new THREE.BufferAttribute(rainPos, 3));
+    const woodTexture = new THREE.CanvasTexture(canvas);
+    woodTexture.wrapS = THREE.RepeatWrapping;
+    woodTexture.wrapT = THREE.RepeatWrapping;
+    woodTexture.repeat.set(1, 8);
 
-    const rainMat = new THREE.PointsMaterial({
-        color: 0x88ccff,
-        size: 0.05,
-        transparent: true,
-        opacity: 0.8
-    });
+    const plankWidth = 0.55;
+    const plankLength = 18;
+    const plankColors = [0x422615, 0x361e10, 0x4a2c18, 0x2d180c, 0x52311b];
 
-    rainParticles = new THREE.Points(rainGeo, rainMat);
-    scene.add(rainParticles);
-}
+    const nailMat = new THREE.MeshStandardMaterial({ color: 0x111115, roughness: 0.3, metalness: 0.8 });
+    const nailGeo = new THREE.CylinderGeometry(0.012, 0.012, 0.02, 8);
 
-function animate() {
-    requestAnimationFrame(animate);
-
-    const time = performance.now() * 0.001;
-
-    if (partyBoxGroup) {
-        partyBoxGroup.position.y = -0.1 + Math.sin(time * 1.5) * 0.05;
-        partyBoxGroup.rotation.y = -0.65 + Math.sin(time * 0.8) * 0.03;
-    }
-
-    if (rainParticles) {
-        const positions = rainParticles.geometry.attributes.position.array;
-        for (let i = 1; i < positions.length; i += 3) {
-            positions[i] -= 0.16;
-            if (positions[i] < 0) {
-                positions[i] = 5.5;
-            }
-        }
-        rainParticles.geometry.attributes.position.needsUpdate = true;
-    }
-
-    if (Math.random() > 0.985) {
-        lightningLight.intensity = 100 + Math.random() * 120;
-    } else {
-        lightningLight.intensity *= 0.85;
-    }
-
-    camera.position.x += (mouseX * 0.4 - camera.position.x) * 0.05;
-    camera.position.y += (-mouseY * 0.2 + 1.8 - camera.position.y) * 0.05;
-    camera.lookAt(0, 1, 0);
-
-    renderer.render(scene, camera);
-}
-
-function resize() {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-}
-
-window.createGame = () => alert("🎮 Spiel wird erstellt...");
-window.joinGame = () => alert("🚪 Lobby beitreten...");
+    for (let x = -9; x <= 9; x += plankWidth + 0.015) {
+        const color = plankColors[Math.floor(Math.random() * plankColors.length)];
+        const plankGeo = new THREE.BoxGeometry(plankWidth, 0.04, plankLength);
+        
