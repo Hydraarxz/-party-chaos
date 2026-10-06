@@ -1,55 +1,4 @@
-/* =========================================
-   3D STAGE & ZENTRIERUNG
-========================================= */
-
-#stage3d {
-    position: fixed;
-    inset: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: 1;
-    display: block;
-    pointer-events: none;
-}
-
-.menu {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: min(900px, 90vw);
-    text-align: center;
-    z-index: 20;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
-.logo {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
-.subtitle {
-    text-align: center;
-    margin: 18px auto 30px;
-}
-
-.menu-buttons {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 18px;
-    width: min(360px, 80vw);
-}
-
-.chaos-button {
-    width: 100%;
-}
-@import url('https://fonts.googleapis.com/css2?family=Creepster&family=Montserrat:wght@900&display=swap');
+/* ======@import url('https://fonts.googleapis.com/css2?family=Bangers&family=Permanent+Marker&family=Rubik+Glitch&family=Space+Grotesk:wght@700;900&display=swap');
 
 * {
     margin: 0;
@@ -59,31 +8,28 @@
 }
 
 body {
-    background-color: #030106;
+    background-color: #030206;
     color: #fff;
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Space Grotesk', sans-serif;
     overflow: hidden;
     height: 100vh;
     width: 100vw;
 }
 
-/* 3D Canvas im Hintergrund */
 #stage3d {
     position: fixed;
     inset: 0;
     width: 100vw;
     height: 100vh;
     z-index: 1;
-    display: block;
 }
 
-/* Menü Container */
 .menu {
     position: absolute;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    width: min(700px, 90vw);
+    width: min(800px, 92vw);
     text-align: center;
     z-index: 20;
     display: flex;
@@ -91,131 +37,142 @@ body {
     align-items: center;
 }
 
-/* LOOGO: Schief, bedrohlich & neon-glühend */
-.logo {
+/* LOGO BOX - Inspiriert von der Jackbox-Verpackung */
+.logo-box {
+    background: #110d18;
+    border: 6px solid #ffffff;
+    padding: 25px 45px;
+    border-radius: 18px;
+    transform: rotate(-4deg) rotateY(12deg) skewY(-2deg);
+    box-shadow: 
+        12px 12px 0px #00f2ff,
+        20px 20px 0px #ff0055,
+        0 0 50px rgba(0, 0, 0, 0.9);
+    position: relative;
+    animation: boxFloat 4s infinite ease-in-out alternate;
+    transition: transform 0.3s ease;
+}
+
+.logo-box:hover {
+    transform: rotate(0deg) scale(1.05);
+}
+
+.logo-inner {
     display: flex;
     flex-direction: column;
     align-items: center;
-    transform: rotate(-3deg);
-    filter: drop-shadow(0 0 20px rgba(186, 0, 255, 0.6));
+    line-height: 0.85;
 }
 
-.logo-word {
-    font-family: 'Creepster', cursive; /* Spukiger Horror-Font */
-    font-size: clamp(3.5rem, 10vw, 6.5rem);
-    letter-spacing: 6px;
-    line-height: 0.9;
-    text-shadow: 
-        0 0 10px #ff0055,
-        0 0 20px #ff0055,
-        0 0 40px #aa00ff;
-    animation: jitter 3s infinite alternate;
+.tagline {
+    font-family: 'Permanent Marker', cursive;
+    font-size: 1.5rem;
+    color: #ffe600;
+    letter-spacing: 4px;
+    align-self: flex-start;
+    transform: rotate(-6deg);
 }
 
-.logo-word.party {
-    color: #ff2a70;
-}
-
-.logo-word.chaos {
-    color: #00ffcc;
-    font-size: clamp(4rem, 12vw, 7.5rem);
-    transform: rotate(5deg) translateY(-10px);
-    text-shadow: 
-        0 0 10px #00ffcc,
-        0 0 25px #00ffcc,
-        0 0 50px #0088ff;
-}
-
-/* Untertitel wie eine Warnung */
-.subtitle {
-    font-size: 0.9rem;
-    font-weight: 900;
-    letter-spacing: 5px;
-    color: #ff3300;
-    margin: 25px 0 35px;
+/* Abgenutzter, rauer Comic/Grunge-Font */
+.title {
+    font-family: 'Bangers', cursive;
     text-transform: uppercase;
-    background: rgba(0, 0, 0, 0.7);
-    padding: 6px 16px;
-    border: 1px solid #ff3300;
-    box-shadow: 0 0 15px rgba(255, 51, 0, 0.4);
-    transform: rotate(-1deg);
+    letter-spacing: 5px;
+    -webkit-text-stroke: 2px #000;
 }
 
-/* BUTTONS im Jackbox-Monster-Style */
+.title.party {
+    font-size: clamp(4rem, 12vw, 7.5rem);
+    color: #ffffff;
+    text-shadow: 
+        4px 4px 0px #ff0055,
+        8px 8px 0px #000;
+}
+
+.title.chaos {
+    font-size: clamp(4.5rem, 14vw, 8.5rem);
+    color: #ffe600;
+    text-shadow: 
+        5px 5px 0px #00f2ff,
+        10px 10px 0px #000;
+    transform: scale(1.1) rotate(2deg);
+}
+
+.pack-tag {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 900;
+    background: #ff0055;
+    color: #fff;
+    padding: 4px 14px;
+    font-size: 0.9rem;
+    border-radius: 6px;
+    align-self: flex-end;
+    margin-top: 10px;
+    transform: rotate(-3deg);
+}
+
+/* UNTERTITEL */
+.subtitle {
+    font-family: 'Permanent Marker', cursive;
+    font-size: 1.1rem;
+    color: #00f2ff;
+    margin: 35px 0 25px;
+    text-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
+}
+
+/* BUTTONS */
 .menu-buttons {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 16px;
     width: min(320px, 85vw);
 }
 
 .chaos-button {
-    background: #0d0614;
-    border: 3px solid #00ffcc;
-    color: #00ffcc;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 1.2rem;
-    font-weight: 900;
-    padding: 16px 24px;
-    border-radius: 8px;
+    background: #fff;
+    border: 4px solid #000;
+    color: #000;
+    font-family: 'Bangers', cursive;
+    font-size: 1.8rem;
+    letter-spacing: 2px;
+    padding: 12px 24px;
+    border-radius: 14px;
     cursor: pointer;
-    position: relative;
-    box-shadow: 
-        0 0 15px rgba(0, 255, 204, 0.3),
-        inset 0 0 10px rgba(0, 255, 204, 0.2);
-    transition: all 0.15s ease-in-out;
-    transform: skewX(-4deg);
+    box-shadow: 6px 6px 0px #000;
+    transition: all 0.15s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 12px;
+    gap: 10px;
 }
 
 .chaos-button.create {
-    border-color: #00ffcc;
-    color: #00ffcc;
+    background: #00f2ff;
 }
 
 .chaos-button.join {
-    border-color: #ff0055;
-    color: #ff0055;
-    box-shadow: 
-        0 0 15px rgba(255, 0, 85, 0.3),
-        inset 0 0 10px rgba(255, 0, 85, 0.2);
-    transform: skewX(3deg);
+    background: #ff0055;
+    color: #fff;
 }
 
-/* Hover-Effekte: Aggressiver Glow & Vibration */
 .chaos-button:hover {
-    transform: scale(1.06) skewX(0deg);
-    background: #180a28;
+    transform: translate(-3px, -3px);
+    box-shadow: 10px 10px 0px #000;
 }
 
-.chaos-button.create:hover {
-    box-shadow: 0 0 30px #00ffcc, inset 0 0 15px #00ffcc;
-    color: #fff;
-    text-shadow: 0 0 8px #00ffcc;
+.chaos-button:active {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0px #000;
 }
 
-.chaos-button.join:hover {
-    box-shadow: 0 0 30px #ff0055, inset 0 0 15px #ff0055;
-    color: #fff;
-    text-shadow: 0 0 8px #ff0055;
-}
-
-/* Versionstext unten */
 .version {
-    margin-top: 40px;
-    font-size: 0.75rem;
-    color: #66527a;
-    letter-spacing: 2px;
+    margin-top: 25px;
+    font-size: 0.8rem;
+    color: #a08bb8;
+    font-weight: 700;
 }
 
-/* Zitter-Animation für das Logo */
-@keyframes jitter {
-    0% { transform: rotate(-3deg) translate(0, 0); }
-    25% { transform: rotate(-2.5deg) translate(1px, -1px); }
-    50% { transform: rotate(-3.5deg) translate(-1px, 1px); }
-    75% { transform: rotate(-2.8deg) translate(2px, 0); }
-    100% { transform: rotate(-3.2deg) translate(-1px, -1px); }
+@keyframes boxFloat {
+    0% { transform: rotate(-4deg) translateY(0px); }
+    100% { transform: rotate(-2deg) translateY(-12px); }
 }
