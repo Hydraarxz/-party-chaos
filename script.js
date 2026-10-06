@@ -1,1 +1,642 @@
-alert("SCRIPT.JS FUNKTIONIERT!");
+import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js";
+
+/* =========================================
+   PARTY CHAOS - 3D STAGE
+========================================= */
+
+let scene;
+let camera;
+let renderer;
+
+let speakers = [];
+let lights = [];
+
+init();
+animate();
+
+
+/* =========================================
+   SZENE ERSTELLEN
+========================================= */
+
+function init() {
+
+    // -------------------------
+    // Szene
+    // -------------------------
+
+    scene = new THREE.Scene();
+
+    scene.background = new THREE.Color(0x030308);
+
+    scene.fog = new THREE.FogExp2(
+        0x080610,
+        0.035
+    );
+
+
+    // -------------------------
+    // Kamera
+    // -------------------------
+
+    camera = new THREE.PerspectiveCamera(
+        45,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        100
+    );
+
+    camera.position.set(0, 3.2, 13);
+
+    camera.lookAt(
+        0,
+        2.5,
+        0
+    );
+
+
+    // -------------------------
+    // Renderer
+    // -------------------------
+
+    const canvas = document.createElement("canvas");
+
+    canvas.id = "stage3d";
+
+    document.body.insertBefore(
+        canvas,
+        document.body.firstChild
+    );
+
+    renderer = new THREE.WebGLRenderer({
+        canvas: canvas,
+        antialias: true
+    });
+
+    renderer.setSize(
+        window.innerWidth,
+        window.innerHeight
+    );
+
+    renderer.setPixelRatio(
+        Math.min(window.devicePixelRatio, 2)
+    );
+
+    renderer.shadowMap.enabled = true;
+
+    renderer.shadowMap.type =
+        THREE.PCFSoftShadowMap;
+
+    renderer.outputColorSpace =
+        THREE.SRGBColorSpace;
+
+
+    // -------------------------
+    // Licht
+    // -------------------------
+
+    const ambientLight =
+        new THREE.AmbientLight(
+            0x151525,
+            1.5
+        );
+
+    scene.add(ambientLight);
+
+
+    // -------------------------
+    // Boden
+    // -------------------------
+
+    createFloor();
+
+
+    // -------------------------
+    // Bühne
+    // -------------------------
+
+    createStage();
+
+
+    // -------------------------
+    // Metall-Träger
+    // -------------------------
+
+    createTruss();
+
+
+    // -------------------------
+    // Lautsprecher
+    // -------------------------
+
+    createSpeaker(-4.7, 2.1, 0);
+    createSpeaker(4.7, 2.1, 0);
+
+
+    // -------------------------
+    // Scheinwerfer
+    // -------------------------
+
+    createSpotlight(
+        -4,
+        6,
+        1,
+        0x218cff
+    );
+
+    createSpotlight(
+        0,
+        6.5,
+        1,
+        0xb840ff
+    );
+
+    createSpotlight(
+        4,
+        6,
+        1,
+        0xffb51b
+    );
+
+
+    // -------------------------
+    // Fenstergröße
+    // -------------------------
+
+    window.addEventListener(
+        "resize",
+        resize
+    );
+}
+
+
+/* =========================================
+   BODEN
+========================================= */
+
+function createFloor() {
+
+    const floorMaterial =
+        new THREE.MeshStandardMaterial({
+            color: 0x15151a,
+            metalness: 0.65,
+            roughness: 0.38
+        });
+
+    const floorGeometry =
+        new THREE.PlaneGeometry(
+            30,
+            30
+        );
+
+    const floor =
+        new THREE.Mesh(
+            floorGeometry,
+            floorMaterial
+        );
+
+    floor.rotation.x =
+        -Math.PI / 2;
+
+    floor.position.y = 0;
+
+    floor.receiveShadow = true;
+
+    scene.add(floor);
+}
+
+
+/* =========================================
+   BÜHNE
+========================================= */
+
+function createStage() {
+
+    const material =
+        new THREE.MeshStandardMaterial({
+            color: 0x202027,
+            metalness: 0.5,
+            roughness: 0.45
+        });
+
+    const geometry =
+        new THREE.BoxGeometry(
+            13,
+            0.35,
+            5
+        );
+
+    const stage =
+        new THREE.Mesh(
+            geometry,
+            material
+        );
+
+    stage.position.set(
+        0,
+        0.35,
+        0
+    );
+
+    stage.receiveShadow = true;
+
+    stage.castShadow = true;
+
+    scene.add(stage);
+}
+
+
+/* =========================================
+   METALL-TRÄGER
+========================================= */
+
+function createTruss() {
+
+    const material =
+        new THREE.MeshStandardMaterial({
+            color: 0x17171a,
+            metalness: 0.9,
+            roughness: 0.25
+        });
+
+
+    // Oberer Balken
+
+    const topGeometry =
+        new THREE.BoxGeometry(
+            12,
+            0.28,
+            0.28
+        );
+
+    const top =
+        new THREE.Mesh(
+            topGeometry,
+            material
+        );
+
+    top.position.set(
+        0,
+        7,
+        0
+    );
+
+    top.castShadow = true;
+
+    scene.add(top);
+
+
+    // Linker Balken
+
+    const sideGeometry =
+        new THREE.BoxGeometry(
+            0.28,
+            7,
+            0.28
+        );
+
+
+    const left =
+        new THREE.Mesh(
+            sideGeometry,
+            material
+        );
+
+    left.position.set(
+        -6,
+        3.5,
+        0
+    );
+
+    left.castShadow = true;
+
+    scene.add(left);
+
+
+    // Rechter Balken
+
+    const right =
+        new THREE.Mesh(
+            sideGeometry,
+            material
+        );
+
+    right.position.set(
+        6,
+        3.5,
+        0
+    );
+
+    right.castShadow = true;
+
+    scene.add(right);
+
+
+    // Diagonale Streben
+
+    for (
+        let x = -5;
+        x <= 5;
+        x += 2
+    ) {
+
+        const diagonal =
+            new THREE.Mesh(
+                new THREE.BoxGeometry(
+                    2.1,
+                    0.08,
+                    0.08
+                ),
+                material
+            );
+
+        diagonal.position.set(
+            x,
+            7,
+            0
+        );
+
+        diagonal.rotation.z =
+            Math.PI / 8;
+
+        scene.add(diagonal);
+    }
+}
+
+
+/* =========================================
+   LAUTSPRECHER
+========================================= */
+
+function createSpeaker(
+    x,
+    y,
+    z
+) {
+
+    const cabinetMaterial =
+        new THREE.MeshStandardMaterial({
+            color: 0x08090b,
+            metalness: 0.7,
+            roughness: 0.3
+        });
+
+
+    // Gehäuse
+
+    const cabinet =
+        new THREE.Mesh(
+            new THREE.BoxGeometry(
+                2,
+                3.8,
+                1.35
+            ),
+            cabinetMaterial
+        );
+
+    cabinet.position.set(
+        x,
+        y,
+        z
+    );
+
+    cabinet.castShadow = true;
+
+    cabinet.receiveShadow = true;
+
+    scene.add(cabinet);
+
+
+    // Große Membran
+
+    const bigDriver =
+        createDriver(
+            0.65,
+            0.65
+        );
+
+    bigDriver.position.set(
+        x,
+        y - 0.65,
+        z - 0.72
+    );
+
+    scene.add(bigDriver);
+
+
+    // Kleine Membran
+
+    const smallDriver =
+        createDriver(
+            0.38,
+            0.38
+        );
+
+    smallDriver.position.set(
+        x,
+        y + 0.8,
+        z - 0.72
+    );
+
+    scene.add(smallDriver);
+
+
+    speakers.push(cabinet);
+}
+
+
+/* =========================================
+   LAUTSPRECHER-MEMBRAN
+========================================= */
+
+function createDriver(
+    radiusX,
+    radiusY
+) {
+
+    const material =
+        new THREE.MeshStandardMaterial({
+            color: 0x090909,
+            metalness: 0.3,
+            roughness: 0.55
+        });
+
+    const geometry =
+        new THREE.CylinderGeometry(
+            radiusX,
+            radiusY,
+            0.16,
+            48
+        );
+
+    const driver =
+        new THREE.Mesh(
+            geometry,
+            material
+        );
+
+    driver.rotation.x =
+        Math.PI / 2;
+
+    driver.castShadow = true;
+
+    return driver;
+}
+
+
+/* =========================================
+   SCHEINWERFER
+========================================= */
+
+function createSpotlight(
+    x,
+    y,
+    z,
+    color
+) {
+
+    // Gehäuse
+
+    const housingMaterial =
+        new THREE.MeshStandardMaterial({
+            color: 0x121214,
+            metalness: 0.8,
+            roughness: 0.3
+        });
+
+    const housing =
+        new THREE.Mesh(
+            new THREE.CylinderGeometry(
+                0.35,
+                0.45,
+                0.8,
+                32
+            ),
+            housingMaterial
+        );
+
+    housing.position.set(
+        x,
+        y,
+        z
+    );
+
+    housing.rotation.z =
+        Math.PI / 2;
+
+    housing.castShadow = true;
+
+    scene.add(housing);
+
+
+    // Licht
+
+    const light =
+        new THREE.SpotLight(
+            color,
+            90,
+            20,
+            Math.PI / 8,
+            0.55,
+            1
+        );
+
+    light.position.set(
+        x,
+        y,
+        z
+    );
+
+    light.target.position.set(
+        0,
+        1,
+        0
+    );
+
+    light.castShadow = true;
+
+    light.shadow.mapSize.width = 1024;
+    light.shadow.mapSize.height = 1024;
+
+    scene.add(light);
+
+    scene.add(light.target);
+
+    lights.push(light);
+}
+
+
+/* =========================================
+   ANIMATION
+========================================= */
+
+function animate() {
+
+    requestAnimationFrame(
+        animate
+    );
+
+
+    // leichte Kamerabewegung
+
+    const time =
+        performance.now() * 0.0003;
+
+    camera.position.x =
+        Math.sin(time) * 0.08;
+
+    camera.position.y =
+        3.2 +
+        Math.sin(time * 1.5) * 0.04;
+
+    camera.lookAt(
+        0,
+        2.5,
+        0
+    );
+
+
+    renderer.render(
+        scene,
+        camera
+    );
+}
+
+
+/* =========================================
+   RESIZE
+========================================= */
+
+function resize() {
+
+    camera.aspect =
+        window.innerWidth /
+        window.innerHeight;
+
+    camera.updateProjectionMatrix();
+
+    renderer.setSize(
+        window.innerWidth,
+        window.innerHeight
+    );
+}
+
+
+/* =========================================
+   BUTTONS
+========================================= */
+
+window.createGame = function() {
+
+    alert(
+        "🎮 Spiel erstellen kommt bald!"
+    );
+
+};
+
+window.joinGame = function() {
+
+    alert(
+        "🚪 Spiel beitreten kommt bald!"
+    );
+
