@@ -103,4 +103,30 @@ function createProceduralRealisticFloor() {
     for (let x = -9; x <= 9; x += plankWidth + 0.015) {
         const color = plankColors[Math.floor(Math.random() * plankColors.length)];
         const plankGeo = new THREE.BoxGeometry(plankWidth, 0.04, plankLength);
-        
+        const textureLoader = new THREE.TextureLoader();
+
+// Texturen laden
+const colorMap = textureLoader.load('color.jpg');
+const normalMap = textureLoader.load('normal.jpg');
+const roughnessMap = textureLoader.load('roughness.jpg');
+
+// Kachelung/Wiederholung einstellen, damit die Bohlen klein & fein wirken
+[colorMap, normalMap, roughnessMap].forEach(tex => {
+    tex.wrapS = THREE.RepeatWrapping;
+    tex.wrapT = THREE.RepeatWrapping;
+    tex.repeat.set(4, 4); // Je höher die Zahl, desto feiner das Muster
+});
+
+// Boden-Material erstellen
+const floorMat = new THREE.MeshStandardMaterial({
+    map: colorMap,
+    normalMap: normalMap,       // Macht die Rillen extrem realistisch!
+    roughnessMap: roughnessMap, // Macht die Glanzpunkte realistisch!
+});
+
+const floorGeo = new THREE.PlaneGeometry(30, 20);
+const floor = new THREE.Mesh(floorGeo, floorMat);
+floor.rotation.x = -Math.PI / 2;
+floor.position.y = -1.2;
+scene.add(floor);
+
