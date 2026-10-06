@@ -8,37 +8,36 @@
 </head>
 <body>
 
-    <!-- 3D Background Canvas -->
+    <!-- Hintergrund-Canvas für Partikel & Noir-Glow -->
     <canvas id="stage3d"></canvas>
 
-    <!-- UI Overlay -->
-    <div class="menu">
+    <!-- Hauptmenü Links wie im Screenshot -->
+    <main class="ui-container">
+        <header class="logo-group">
+            <span class="sub-title">THE</span>
+            <h1 class="logo-title">
+                PARTY<br>
+                CHAOS
+            </h1>
+            <div class="edition-badge">1</div>
+        </header>
 
-        <!-- JACKBOX-STYLE 3D-BOX LOGO -->
-        <div class="logo-box">
-            <div class="logo-inner">
-                <span class="tagline">THE</span>
-                <h1 class="title party">PARTY</h1>
-                <h1 class="title chaos">CHAOS</h1>
-                <span class="pack-tag">PACK 1</span>
-            </div>
-        </div>
-
-        <p class="subtitle">⚡ DAS ULTIMATIVE PARTY-GAME ⚡</p>
-
-        <!-- BUTTONS -->
-        <div class="menu-buttons">
-            <button class="chaos-button create" onclick="createGame()">
-                <span class="btn-icon">🎮</span> SPIEL ERSTELLEN
+        <nav class="menu-list">
+            <button class="menu-item active" onclick="createGame()">
+                <span class="bullet">▶</span> SPIEL ERSTELLEN
             </button>
-            <button class="chaos-button join" onclick="joinGame()">
-                <span class="btn-icon">🚪</span> SPIEL BEITRETEN
+            <button class="menu-item" onclick="joinGame()">
+                <span class="bullet">▶</span> SPIEL BEITRETEN
             </button>
-        </div>
+            <button class="menu-item disabled">EINSTELLUNGEN</button>
+            <button class="menu-item disabled">ANLEITUNG</button>
+        </nav>
 
-        <p class="version">v1.0 • CHAOS EDITION</p>
-
-    </div>
+        <footer class="footer-info">
+            <p>Verbinde dich mit deinem Smartphone als Controller.</p>
+            <span class="version">v1.0 • NOIR EDITION</span>
+        </footer>
+    </main>
 
     <script type="module" src="script.js"></script>
 </body>
