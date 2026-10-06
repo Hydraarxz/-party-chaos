@@ -1,151 +1,82 @@
-@import url('https://fonts.googleapis.com/css2?family=Anton&family=Plus+Jakarta+Sans:wght@700;800;900&display=swap');
+import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js";
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    user-select: none;
+let scene, camera, renderer;
+let particleSystem;
+
+init();
+animate();
+
+function init() {
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x060608); // Sehr dunkles, edles Grau-Schwarz
+    scene.fog = new THREE.FogExp2(0x060608, 0.03);
+
+    camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.set(0, 0, 10);
+
+    const canvas = document.getElementById("stage3d");
+    renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    // Schwebende Staub- / Licht-Partikel
+    createDustParticles();
+
+    // Sanftes, farbiges Umgebungslicht (Rechts im Hintergrund)
+    const backLight = new THREE.PointLight(0xff0055, 3, 20);
+    backLight.position.set(5, -2, 2);
+    scene.add(backLight);
+
+    const blueLight = new THREE.PointLight(0x00f2ff, 2, 20);
+    blueLight.position.set(-5, 4, 1);
+    scene.add(blueLight);
+
+    window.addEventListener("resize", resize);
 }
 
-body {
-    background-color: #08080a;
-    color: #f0f0f5;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    overflow: hidden;
-    height: 100vh;
-    width: 100vw;
+function createDustParticles() {
+    const count = 300;
+    const geometry = new THREE.BufferGeometry();
+    const positions = new Float32Array(count * 3);
+
+    for (let i = 0; i < count * 3; i += 3) {
+        positions[i] = (Math.random() - 0.5) * 18;
+        positions[i + 1] = (Math.random() - 0.5) * 12;
+        positions[i + 2] = (Math.random() - 0.5) * 10;
+    }
+
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+    const material = new THREE.PointsMaterial({
+        color: 0xffffff,
+        size: 0.04,
+        transparent: true,
+        opacity: 0.3
+    });
+
+    particleSystem = new THREE.Points(geometry, material);
+    scene.add(particleSystem);
 }
 
-/* 3D / Canvas im Hintergrund */
-#stage3d {
-    position: fixed;
-    inset: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: 1;
+function animate() {
+    requestAnimationFrame(animate);
+
+    const time = performance.now() * 0.0005;
+
+    // Sehr dezente Partikel-Rotation
+    if (particleSystem) {
+        particleSystem.rotation.y = time * 0.2;
+        particleSystem.rotation.x = Math.sin(time * 0.1) * 0.1;
+    }
+
+    renderer.render(scene, camera);
 }
 
-/* UI-Container links platziert wie bei Jackbox 4 */
-.ui-container {
-    position: absolute;
-    left: 8vw;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 10;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    max-width: 450px;
+function resize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
-/* LOGO: Extrem hoher, moderner Condensed-Font (Anton) */
-.logo-group {
-    position: relative;
-    margin-bottom: 40px;
-}
-
-.sub-title {
-    font-size: 1.2rem;
-    font-weight: 800;
-    letter-spacing: 4px;
-    color: #8a8a9e;
-    display: block;
-    margin-bottom: -5px;
-}
-
-.logo-title {
-    font-family: 'Anton', sans-serif;
-    font-size: clamp(4.5rem, 9vw, 7rem);
-    line-height: 0.82;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: #ffffff;
-    /* Subtiler Stempel- / Textur-Effekt */
-    text-shadow: 
-        2px 2px 0px rgba(0, 0, 0, 0.8),
-        0 0 30px rgba(255, 255, 255, 0.15);
-}
-
-/* Farbige schräge Nummer als Hingucker (wie die 4 im Screenshot) */
-.edition-badge {
-    position: absolute;
-    right: -55px;
-    bottom: -10px;
-    font-family: 'Anton', sans-serif;
-    font-size: 7rem;
-    line-height: 1;
-    background: linear-gradient(135deg, #ff0055, #ff9900, #00f2ff);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    transform: rotate(12deg) skewX(-5deg);
-    filter: drop-shadow(4px 4px 10px rgba(0,0,0,0.8));
-}
-
-/* MENÜLISTE (Sehr clean & modern) */
-.menu-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    width: 100%;
-    margin-bottom: 50px;
-}
-
-.menu-item {
-    background: transparent;
-    border: none;
-    color: #a0a0b5;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 1.5rem;
-    font-weight: 800;
-    text-align: left;
-    padding: 8px 0;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    letter-spacing: 0.5px;
-}
-
-.menu-item .bullet {
-    opacity: 0;
-    transform: translateX(-10px);
-    transition: all 0.2s ease;
-    color: #ff0055;
-    font-size: 1.1rem;
-}
-
-.menu-item:hover {
-    color: #ffffff;
-    transform: translateX(10px);
-}
-
-.menu-item:hover .bullet {
-    opacity: 1;
-    transform: translateX(0);
-}
-
-.menu-item.disabled {
-    color: #3f3f4e;
-    cursor: not-allowed;
-}
-
-.menu-item.disabled:hover {
-    transform: none;
-}
-
-/* FOOTER */
-.footer-info {
-    color: #5d5d73;
-    font-size: 0.85rem;
-    font-weight: 700;
-    line-height: 1.5;
-}
-
-.version {
-    display: block;
-    margin-top: 6px;
-    font-size: 0.75rem;
-    color: #3f3f4e;
-    letter-spacing: 2px;
-}
+window.createGame = () => alert("🎮 Spiel wird erstellt...");
+window.joinGame = () => alert("🚪 Lobby beitreten...");
