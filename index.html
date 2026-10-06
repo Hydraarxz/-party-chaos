@@ -8,49 +8,38 @@
 </head>
 <body>
 
-    <!-- 3D Canvas für Three.js -->
+    <!-- 3D Background Canvas -->
     <canvas id="stage3d"></canvas>
 
-    <!-- HAUPTMENÜ CONTAINER -->
+    <!-- UI Overlay -->
     <div class="menu">
 
-        <!-- HAUPTLOGO -->
-        <div class="logo">
-            <div class="logo-word party">
-                <span>P</span>
-                <span>A</span>
-                <span>R</span>
-                <span>T</span>
-                <span>Y</span>
-            </div>
-            <div class="logo-word chaos">
-                <span>C</span>
-                <span>H</span>
-                <span>A</span>
-                <span>O</span>
-                <span>S</span>
+        <!-- JACKBOX-STYLE 3D-BOX LOGO -->
+        <div class="logo-box">
+            <div class="logo-inner">
+                <span class="tagline">THE</span>
+                <h1 class="title party">PARTY</h1>
+                <h1 class="title chaos">CHAOS</h1>
+                <span class="pack-tag">PACK 1</span>
             </div>
         </div>
 
-        <p class="subtitle">DAS CHAOTISCHSTE PARTY-GAME</p>
+        <p class="subtitle">⚡ DAS ULTIMATIVE PARTY-GAME ⚡</p>
 
         <!-- BUTTONS -->
         <div class="menu-buttons">
             <button class="chaos-button create" onclick="createGame()">
-                <span>🎮</span> SPIEL ERSTELLEN
+                <span class="btn-icon">🎮</span> SPIEL ERSTELLEN
             </button>
             <button class="chaos-button join" onclick="joinGame()">
-                <span>🚪</span> SPIEL BEITRETEN
+                <span class="btn-icon">🚪</span> SPIEL BEITRETEN
             </button>
         </div>
 
-        <div id="game"></div>
-
-        <p class="version">v0.1 • CHAOS EDITION</p>
+        <p class="version">v1.0 • CHAOS EDITION</p>
 
     </div>
 
-    <!-- type="module" ist wichtig für ESM imports -->
     <script type="module" src="script.js"></script>
 </body>
 </html>
