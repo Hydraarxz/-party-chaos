@@ -2,69 +2,20 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Party Chaos</title>
-
     <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-    
-<div class="background">
-    <div class="light light-1"></div>
-    <div class="light light-2"></div>
-    <div class="light light-3"></div>
-</div>
-    <!-- 3D PARTY STAGE -->
-<div class="stage-objects">
 
-  <div class="truss truss-top"></div>
-  <div class="truss truss-left"></div>
-  <div class="truss truss-right"></div>
+    <!-- 3D Canvas für Three.js -->
+    <canvas id="stage3d"></canvas>
 
-  <div class="stage-light stage-light-1">
-    <div class="lamp"></div>
-  </div>
-
-  <div class="stage-light stage-light-2">
-    <div class="lamp"></div>
-  </div>
-
-  <div class="stage-light stage-light-3">
-    <div class="lamp"></div>
-  </div>
-
-  <div class="speaker speaker-left">
-    <div class="speaker-top"></div>
-    <div class="speaker-grille">
-      <div class="speaker-driver big"></div>
-      <div class="speaker-driver small"></div>
-    </div>
-  </div>
-
-  <div class="speaker speaker-right">
-    <div class="speaker-top"></div>
-    <div class="speaker-grille">
-      <div class="speaker-driver big"></div>
-      <div class="speaker-driver small"></div>
-    </div>
-  </div>
-
-  <div class="stage-floor"></div>
-  <div class="stage-haze"></div>
-
-</div>
-    <!-- Neon Licht hinter dem Logo -->
-    <div class="neon-light"></div>
-
-    <!-- Hintergrund-Partikel -->
-    <div id="particles"></div>
+    <!-- HAUPTMENÜ CONTAINER -->
+    <div class="menu">
 
         <!-- HAUPTLOGO -->
         <div class="logo">
-
             <div class="logo-word party">
                 <span>P</span>
                 <span>A</span>
@@ -72,7 +23,6 @@
                 <span>T</span>
                 <span>Y</span>
             </div>
-
             <div class="logo-word chaos">
                 <span>C</span>
                 <span>H</span>
@@ -80,37 +30,27 @@
                 <span>O</span>
                 <span>S</span>
             </div>
-
         </div>
 
-        <p class="subtitle">
-            DAS CHAOTISCHSTE PARTY-GAME
-        </p>
+        <p class="subtitle">DAS CHAOTISCHSTE PARTY-GAME</p>
 
         <!-- BUTTONS -->
         <div class="menu-buttons">
-
-            <button class="chaos-button create"
-                    onclick="createGame()">
-                <span>🎮</span>
-                SPIEL ERSTELLEN
+            <button class="chaos-button create" onclick="createGame()">
+                <span>🎮</span> SPIEL ERSTELLEN
             </button>
-
-            <button class="chaos-button join"
-                    onclick="joinGame()">
-                <span>🚪</span>
-                SPIEL BEITRETEN
+            <button class="chaos-button join" onclick="joinGame()">
+                <span>🚪</span> SPIEL BEITRETEN
             </button>
-
         </div>
 
         <div id="game"></div>
 
         <p class="version">v0.1 • CHAOS EDITION</p>
 
-    </main>
+    </div>
 
-    <script src="script.js"></script>
-    <canvas id="stage3d"></canvas>
+    <!-- type="module" ist wichtig für ESM imports -->
+    <script type="module" src="script.js"></script>
 </body>
 </html>
