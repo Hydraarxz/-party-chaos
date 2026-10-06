@@ -206,3 +206,34 @@ window.createGame = function() {
 window.joinGame = function() {
     alert("🚪 Spiel beitreten kommt bald!");
 };
+v    // 1. Szene & Düsterer Nebel (Blutrot / Dunkelviolett)
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x020104); // Sehr dunkles Violett-Schwarz
+    scene.fog = new THREE.FogExp2(0x12021a, 0.05); // Dichter, spukiger Nebel
+
+    // 2. Kamera (etwas näher und tiefer für mehr Dramatik)
+    camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.set(0, 2.5, 11);
+    camera.lookAt(0, 2, 0);
+
+    // 3. Canvas aus HTML
+    const canvas = document.getElementById("stage3d");
+    renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    // 4. Düsteres Umgebungslicht
+    const ambientLight = new THREE.AmbientLight(0x2a083b, 0.8); // Dunkles Purple
+    scene.add(ambientLight);
+
+    createFloor();
+    createStage();
+    createTruss();
+
+    createSpeaker(-4.7, 2.1, 0);
+    createSpeaker(4.7, 2.1, 0);
+
+    // Unheimliche Scheinwerfer-Farben (Giftgrün, Blutrot, Cyan)
+    createSpotlight(-4, 6, 1, 0x00ff66); // Giftgrün
+    createSpotlight(0, 6.5, 1, 0xff0044);  // Blutrot
+    createSpotlight(4, 6, 1, 0x00ccff);  // Cyan
