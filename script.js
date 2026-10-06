@@ -1,173 +1,133 @@
-@import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Orbitron:wght@900&display=swap');
+import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js";
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    user-select: none;
+let scene, camera, renderer;
+let speakers = [];
+let spotLights = [];
+let lasers = [];
+
+let mouseX = 0, mouseY = 0;
+
+init();
+animate();
+
+function init() {
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x040208);
+    scene.fog = new THREE.FogExp2(0x0c0518, 0.04);
+
+    camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.set(0, 3, 11);
+
+    const canvas = document.getElementById("stage3d");
+    renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    const ambient = new THREE.AmbientLight(0x331144, 1.5);
+    scene.add(ambient);
+
+    createFloor();
+    createStage();
+    createSpeakers();
+    createLighting();
+    createLasers();
+
+    // Interaktive Mausbewegung
+    window.addEventListener("mousemove", (e) => {
+        mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+        mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+    });
+
+    window.addEventListener("resize", resize);
 }
 
-body {
-    background-color: #020106;
-    color: #fff;
-    font-family: 'Orbitron', sans-serif;
-    overflow: hidden;
-    height: 100vh;
-    width: 100vw;
+function createFloor() {
+    const mat = new THREE.MeshStandardMaterial({ color: 0x08080d, roughness: 0.2, metalness: 0.8 });
+    const floor = new THREE.Mesh(new THREE.PlaneGeometry(40, 40), mat);
+    floor.rotation.x = -Math.PI / 2;
+    scene.add(floor);
 }
 
-/* 3D Canvas */
-#stage3d {
-    position: fixed;
-    inset: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: 1;
-    display: block;
+function createStage() {
+    const mat = new THREE.MeshStandardMaterial({ color: 0x151020, roughness: 0.4 });
+    const stage = new THREE.Mesh(new THREE.BoxGeometry(14, 0.5, 6), mat);
+    stage.position.set(0, 0.25, 0);
+    scene.add(stage);
 }
 
-/* Hauptmenü Container */
-.menu {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: min(850px, 92vw);
-    text-align: center;
-    z-index: 20;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+function createSpeakers() {
+    const mat = new THREE.MeshStandardMaterial({ color: 0x0a0a10, roughness: 0.3 });
+    
+    [-5.2, 5.2].forEach(x => {
+        const spk = new THREE.Mesh(new THREE.BoxGeometry(2.2, 4.2, 1.5), mat);
+        spk.position.set(x, 2.3, 0);
+        speakers.push(spk);
+        scene.add(spk);
+    });
 }
 
-/* LOOGO: Wuchtig, schräg & edler Glow */
-.logo {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    transform: skewY(-3deg) rotate(-2deg);
-    position: relative;
+function createLighting() {
+    const colors = [0xff0055, 0x00f2ff, 0xffe600, 0xaa00ff];
+    
+    colors.forEach((color, i) => {
+        const spot = new THREE.SpotLight(color, 150, 25, Math.PI / 7, 0.5);
+        spot.position.set((i - 1.5) * 3.5, 7, 1);
+        spot.target.position.set((i - 1.5) * 2, 0, 0);
+        scene.add(spot);
+        scene.add(spot.target);
+        spotLights.push(spot);
+    });
 }
 
-.logo-word {
-    font-family: 'Black Han Sans', sans-serif;
-    text-transform: uppercase;
-    line-height: 0.85;
-    letter-spacing: 4px;
+/* Rotierende Disko-Laserstrahlen */
+function createLasers() {
+    const laserMat = new THREE.MeshBasicMaterial({ color: 0x00f2ff, transparent: true, opacity: 0.7 });
+    
+    for(let i = 0; i < 4; i++) {
+        const geom = new THREE.CylinderGeometry(0.02, 0.02, 15);
+        const laser = new THREE.Mesh(geom, laserMat);
+        laser.position.set((i - 1.5) * 3, 6.5, -1);
+        laser.rotation.z = Math.PI / 4 * (i % 2 === 0 ? 1 : -1);
+        lasers.push(laser);
+        scene.add(laser);
+    }
 }
 
-.logo-word.party {
-    font-size: clamp(3.8rem, 11vw, 7rem);
-    color: #fff;
-    text-shadow: 
-        0 0 10px #ff0055,
-        0 0 25px #ff0055,
-        0 0 50px #ff0055,
-        3px 3px 0px #000;
-    animation: titleGlow 2.5s infinite alternate ease-in-out;
+function animate() {
+    requestAnimationFrame(animate);
+    const t = performance.now() * 0.002;
+
+    // Kamera folgt sanft der Maus
+    camera.position.x += (mouseX * 0.8 - camera.position.x) * 0.05;
+    camera.position.y += (-mouseY * 0.5 + 3 - camera.position.y) * 0.05;
+    camera.lookAt(0, 2.2, 0);
+
+    // Laser-Bewegung
+    lasers.forEach((l, i) => {
+        l.rotation.x = Math.sin(t + i) * 0.5;
+        l.rotation.z = Math.cos(t * 0.8 + i) * 0.6;
+    });
+
+    // Scheinwerfer kreisen & flackern
+    spotLights.forEach((spot, i) => {
+        spot.target.position.x = Math.sin(t * 1.5 + i) * 3;
+        spot.intensity = 120 + Math.sin(t * 10 + i) * 30;
+    });
+
+    // Lautsprecher-Bass-Pumpen
+    speakers.forEach((s, i) => {
+        const scale = 1 + Math.sin(t * 12 + i) * 0.03;
+        s.scale.set(scale, scale, scale);
+    });
+
+    renderer.render(scene, camera);
 }
 
-.logo-word.chaos {
-    font-size: clamp(4.5rem, 14vw, 8.5rem);
-    color: #00f2ff;
-    text-shadow: 
-        0 0 10px #00f2ff,
-        0 0 30px #00f2ff,
-        0 0 60px #0077ff,
-        4px 4px 0px #000;
-    transform: translateY(-10px) scale(1.05);
-    animation: pulseChaos 2s infinite alternate ease-in-out;
+function resize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
-/* Untertitel als Sleeke Cyber-Badge */
-.subtitle {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 900;
-    letter-spacing: 6px;
-    color: #ff3366;
-    margin: 25px 0 35px;
-    text-transform: uppercase;
-    background: rgba(10, 2, 18, 0.85);
-    padding: 8px 22px;
-    border-left: 3px solid #ff0055;
-    border-right: 3px solid #00f2ff;
-    box-shadow: 0 0 25px rgba(255, 0, 85, 0.3);
-    backdrop-filter: blur(8px);
-}
-
-/* BUTTONS: Modernes Cyber-Jackbox Design */
-.menu-buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-    width: min(340px, 85vw);
-}
-
-.chaos-button {
-    background: rgba(15, 5, 25, 0.85);
-    border: 2px solid #00f2ff;
-    color: #fff;
-    font-family: 'Orbitron', sans-serif;
-    font-size: 1.1rem;
-    font-weight: 900;
-    padding: 18px 28px;
-    border-radius: 12px;
-    cursor: pointer;
-    backdrop-filter: blur(10px);
-    box-shadow: 
-        0 0 20px rgba(0, 242, 255, 0.25),
-        inset 0 0 15px rgba(0, 242, 255, 0.15);
-    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    transform: skewX(-6deg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-}
-
-.chaos-button.create {
-    border-color: #00f2ff;
-}
-
-.chaos-button.join {
-    border-color: #ff0055;
-    box-shadow: 
-        0 0 20px rgba(255, 0, 85, 0.25),
-        inset 0 0 15px rgba(255, 0, 85, 0.15);
-}
-
-/* Hover & Active Effekte */
-.chaos-button:hover {
-    transform: scale(1.05) skewX(0deg);
-}
-
-.chaos-button.create:hover {
-    background: #00f2ff;
-    color: #000;
-    box-shadow: 0 0 35px #00f2ff;
-}
-
-.chaos-button.join:hover {
-    background: #ff0055;
-    color: #fff;
-    box-shadow: 0 0 35px #ff0055;
-}
-
-.version {
-    margin-top: 35px;
-    font-size: 0.7rem;
-    color: #8a70a8;
-    letter-spacing: 3px;
-}
-
-/* Animations */
-@keyframes titleGlow {
-    0% { filter: drop-shadow(0 0 15px rgba(255, 0, 85, 0.6)); }
-    100% { filter: drop-shadow(0 0 30px rgba(255, 0, 85, 1)); }
-}
-
-@keyframes pulseChaos {
-    0% { transform: translateY(-10px) scale(1.05); }
-    100% { transform: translateY(-14px) scale(1.08); }
-}
+window.createGame = () => alert("🎮 Spiel erstellen!");
+window.joinGame = () => alert("🚪 Spiel beitreten!");
