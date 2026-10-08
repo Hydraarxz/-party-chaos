@@ -16,12 +16,21 @@ function init() {
     camera.position.set(0, 1.6, 8.5);
 
     const canvas = document.getElementById("stage3d");
-    renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: false });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.1;
+    renderer = new THREE.WebGLRenderer({
+    canvas: canvas,
+    antialias: true,
+    alpha: false
+});
 
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.15;
     setupLighting();
     createProceduralRealisticFloor(); // Lädt deine echten Bilder für den Boden
     createGroundedDetailedCrate();
@@ -58,6 +67,61 @@ function setupLighting() {
 
 /* 1. EDLER, REALISTISCHER DIELENBODEN MIT ECHTEN TEXTUREN */
 function createProceduralRealisticFloor() {
+    const loader = new THREE.TextureLoader();
+
+    const colorMap = loader.load("color.jpg");
+    const normalMap = loader.load("normal.jpg");
+    const roughnessMap = loader.load("roughness.jpg");
+
+    // Richtige Farbbehandlung
+    colorMap.colorSpace = THREE.SRGBColorSpace;
+
+    // Textur deutlich öfter wiederholen
+    colorMap.wrapS = THREE.RepeatWrapping;
+    colorMap.wrapT = THREE.RepeatWrapping;
+
+    normalMap.wrapS = THREE.RepeatWrapping;
+    normalMap.wrapT = THREE.RepeatWrapping;
+
+    roughnessMap.wrapS = THREE.RepeatWrapping;
+    roughnessMap.wrapT = THREE.RepeatWrapping;
+
+    colorMap.repeat.set(10, 7);
+    normalMap.repeat.set(10, 7);
+    roughnessMap.repeat.set(10, 7);
+
+    // Schärfere Textur bei schrägem Blickwinkel
+    colorMap.anisotropy = renderer.capabilities.getMaxAnisotropy();
+    normalMap.anisotropy = renderer.capabilities.getMaxAnisotropy();
+    roughnessMap.anisotropy = renderer.capabilities.getMaxAnisotropy();
+
+    const material = new THREE.MeshPhysicalMaterial({
+        map: colorMap,
+        normalMap: normalMap,
+        roughnessMap: roughnessMap,
+
+        // Material selbst
+        roughness: 0.28,
+        metalness: 0.15,
+
+        // leichte glänzende Oberfläche
+        clearcoat: 0.35,
+        clearcoatRoughness: 0.18,
+
+        normalScale: new THREE.Vector2(1.4, 1.4)
+    });
+
+    const geometry = new THREE.PlaneGeometry(30, 20, 128, 128);
+
+    const floor = new THREE.Mesh(geometry, material);
+
+    floor.rotation.x = -Math.PI / 2;
+    floor.position.y = -1.2;
+
+    floor.receiveShadow = true;
+
+    scene.add(floor);
+}
     const textureLoader = new THREE.TextureLoader();
 
     // Lade die 3 heruntergeladenen Bilddateien aus deinem Ordner
