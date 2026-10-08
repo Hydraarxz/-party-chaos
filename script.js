@@ -37,15 +37,15 @@ function setupLighting() {
     const ambientLight = new THREE.AmbientLight(0x33334e, 1.8);
     scene.add(ambientLight);
 
-    // Warmes Licht auf den Boden
-    const warmSpot = new THREE.SpotLight(0xffb866, 220, 20, Math.PI / 3.5, 0.6);
+    // Warmes Spotlight für den Boden
+    const warmSpot = new THREE.SpotLight(0xffb866, 250, 22, Math.PI / 3.5, 0.6);
     warmSpot.position.set(-3.5, 4.5, 4);
     warmSpot.target.position.set(0, -1.2, 0);
     scene.add(warmSpot);
     scene.add(warmSpot.target);
 
-    // Kisten-Licht
-    const boxSpot = new THREE.SpotLight(0xffaa55, 160, 15, Math.PI / 4, 0.5);
+    // Kisten-Spotlight
+    const boxSpot = new THREE.SpotLight(0xffaa55, 180, 15, Math.PI / 4, 0.5);
     boxSpot.position.set(3, 4, 3);
     boxSpot.target.position.set(2, -1.2, 0);
     scene.add(boxSpot);
@@ -56,51 +56,49 @@ function setupLighting() {
     scene.add(lightningLight);
 }
 
-/* 1. KRAFTVOLLER HOLZBODEN (BILD-UNABHÄNGIG) */
+/* 1. HOLZBODEN PROZEDURAL ERZEUGT (OHNE BILDDATEIEN - GELINGT IMMER!) */
 function createProceduralRealisticFloor() {
-    const floorGroup = new THREE.Group();
+    // Dynamische Holztextur im Speicher generieren
+    const canvas = document.createElement('canvas');
+    canvas.width = 512;
+    canvas.height = 512;
+    const ctx = canvas.getContext('2d');
 
-    // Dielen-Struktur & Grundmaterial
+    // Grundfarbe Edles Dunkelholz
+    ctx.fillStyle = '#3a2012';
+    ctx.fillRect(0, 0, 512, 512);
+
+    // Holzmaserung zeichnen
+    for (let i = 0; i < 600; i++) {
+        ctx.fillStyle = Math.random() > 0.5 ? 'rgba(0, 0, 0, 0.12)' : 'rgba(255, 255, 255, 0.05)';
+        const y = Math.random() * 512;
+        const h = Math.random() * 3 + 1;
+        ctx.fillRect(0, y, 512, h);
+    }
+
+    // Dielen-Fugen zeichnen
+    ctx.fillStyle = '#0a0503';
+    for (let y = 0; y < 512; y += 64) {
+        ctx.fillRect(0, y, 512, 4);
+    }
+
+    const generatedTexture = new THREE.CanvasTexture(canvas);
+    generatedTexture.wrapS = THREE.RepeatWrapping;
+    generatedTexture.wrapT = THREE.RepeatWrapping;
+    generatedTexture.repeat.set(4, 6);
+
     const floorGeo = new THREE.PlaneGeometry(30, 20);
     const floorMat = new THREE.MeshStandardMaterial({
-        color: 0x4a2c17, // Schöne warme Holzfarbe
-        roughness: 0.35,  // Glanz im Licht
+        map: generatedTexture,
+        roughness: 0.3, // Schöner Glanz im Lichtkegel
         metalness: 0.05
-    });
-
-    // Versuche Texturen zu laden, falls verfügbar
-    const textureLoader = new THREE.TextureLoader();
-    textureLoader.load('./color.jpg', (tex) => {
-        tex.wrapS = THREE.RepeatWrapping;
-        tex.wrapT = THREE.RepeatWrapping;
-        tex.repeat.set(5, 3);
-        floorMat.map = tex;
-        floorMat.needsUpdate = true;
-    });
-
-    textureLoader.load('./normal.jpg', (tex) => {
-        tex.wrapS = THREE.RepeatWrapping;
-        tex.wrapT = THREE.RepeatWrapping;
-        tex.repeat.set(5, 3);
-        floorMat.normalMap = tex;
-        floorMat.needsUpdate = true;
     });
 
     const floor = new THREE.Mesh(floorGeo, floorMat);
     floor.rotation.x = -Math.PI / 2;
     floor.position.y = -1.2;
-    floorGroup.add(floor);
 
-    // Dielen-Schattenlinien für echte Holzplanken-Optik
-    const lineMat = new THREE.MeshBasicMaterial({ color: 0x0f0804 });
-    for (let x = -15; x <= 15; x += 0.8) {
-        const lineGeo = new THREE.BoxGeometry(0.02, 0.01, 20);
-        const line = new THREE.Mesh(lineGeo, lineMat);
-        line.position.set(x, -1.195, 0);
-        floorGroup.add(line);
-    }
-
-    scene.add(floorGroup);
+    scene.add(floor);
 }
 
 /* 2. HOCHDETAILLIERTE KISTE (FEST AUF DEM BODEN) */
@@ -109,7 +107,7 @@ function createGroundedDetailedCrate() {
 
     const w = 2.2, h = 2.2, d = 2.2;
 
-    // Schattenfleck direkt unter der Kiste
+    // Schatten am Boden
     const shadowGeo = new THREE.PlaneGeometry(3.5, 3.5);
     const shadowMat = new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.8 });
     const shadow = new THREE.Mesh(shadowGeo, shadowMat);
@@ -162,3 +160,87 @@ function createLargeAtmosphericWindow() {
 
     const glassGeo = new THREE.PlaneGeometry(4.4, 3.2);
     const glassMat = new THREE.MeshStandardMaterial({
+        color: 0x1c2d42,
+        roughness: 0.1,
+        transparent: true,
+        opacity: 0.85
+    });
+    const glass = new THREE.Mesh(glassGeo, glassMat);
+    glass.position.z = 0.02;
+    windowGroup.add(glass);
+
+    const barMat = new THREE.MeshStandardMaterial({ color: 0x0a0a0f, roughness: 0.8 });
+    
+    [-1.1, 0, 1.1].forEach(x => {
+        const vBar = new THREE.Mesh(new THREE.BoxGeometry(0.12, 3.2, 0.2), barMat);
+        vBar.position.set(x, 0, 0.05);
+        windowGroup.add(vBar);
+    });
+
+    [-0.8, 0, 0.8].forEach(y => {
+        const hBar = new THREE.Mesh(new THREE.BoxGeometry(4.4, 0.12, 0.2), barMat);
+        hBar.position.set(0, y, 0.05);
+        windowGroup.add(hBar);
+    });
+
+    windowGroup.position.set(1.8, 2.3, -4.2);
+    scene.add(windowGroup);
+
+    const rainCount = 800;
+    const rainGeo = new THREE.BufferGeometry();
+    const rainPos = new Float32Array(rainCount * 3);
+
+    for (let i = 0; i < rainCount * 3; i += 3) {
+        rainPos[i] = 1.8 + (Math.random() - 0.5) * 6;
+        rainPos[i + 1] = Math.random() * 5 - 1;
+        rainPos[i + 2] = -4.0 + (Math.random() - 0.5) * 1.2;
+    }
+
+    rainGeo.setAttribute('position', new THREE.BufferAttribute(rainPos, 3));
+
+    const rainMat = new THREE.PointsMaterial({
+        color: 0x88bbff,
+        size: 0.045,
+        transparent: true,
+        opacity: 0.75
+    });
+
+    rainParticles = new THREE.Points(rainGeo, rainMat);
+    scene.add(rainParticles);
+}
+
+function animate() {
+    requestAnimationFrame(animate);
+
+    if (rainParticles) {
+        const positions = rainParticles.geometry.attributes.position.array;
+        for (let i = 1; i < positions.length; i += 3) {
+            positions[i] -= 0.18;
+            if (positions[i] < -1.2) {
+                positions[i] = 4.2;
+            }
+        }
+        rainParticles.geometry.attributes.position.needsUpdate = true;
+    }
+
+    if (Math.random() > 0.988) {
+        lightningLight.intensity = 150 + Math.random() * 180;
+    } else {
+        lightningLight.intensity *= 0.82;
+    }
+
+    camera.position.x += (mouseX * 0.35 - camera.position.x) * 0.04;
+    camera.position.y += (-mouseY * 0.2 + 1.6 - camera.position.y) * 0.04;
+    camera.lookAt(0, 0.4, 0);
+
+    renderer.render(scene, camera);
+}
+
+function resize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+window.createGame = () => alert("🎮 Spiel wird erstellt...");
+window.joinGame = () => alert("🚪 Lobby beitreten...");
