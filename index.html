@@ -4,40 +4,68 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Party Chaos</title>
-    <link rel="stylesheet" href="style.css?v=5000">
+    
+    <!-- CSS-Einbindung mit Cache-Buster -->
+    <link rel="stylesheet" href="style.css?v=6000">
 </head>
 <body>
 
-    <!-- 3D Canvas für Holzboden, Kiste & Regen-Fenster -->
+    <!-- 3D WebGL Canvas Layer -->
     <canvas id="stage3d"></canvas>
 
-    <!-- Hauptmenü Links -->
-    <main class="ui-container">
-        <header class="logo-group">
-            <h1 class="logo-title">
-                PARTY<br>
-                CHAOS
-            </h1>
+    <!-- Retro / Noir Effekt-Layer -->
+    <div class="cinematic-vignette"></div>
+    <div class="cinematic-scanlines"></div>
+    <div class="cinematic-grain"></div>
+
+    <!-- UI Overlay (Menü & Titel) -->
+    <div class="ui-overlay">
+        
+        <!-- HEADER / LOGO -->
+        <header class="ui-header">
+            <div class="logo-container">
+                <span class="logo-badge">v1.0 • Rainy Noir Edition</span>
+                <h1 class="logo-title">PARTY<br>CHAOS</h1>
+            </div>
         </header>
 
-        <nav class="menu-list">
-            <button class="menu-item active" onclick="createGame()">
-                <span class="bullet">▶</span> SPIEL ERSTELLEN
-            </button>
-            <button class="menu-item" onclick="joinGame()">
-                <span class="bullet">▶</span> SPIEL BEITRETEN
-            </button>
-            <button class="menu-item disabled">EINSTELLUNGEN</button>
-            <button class="menu-item disabled">ANLEITUNG</button>
-        </nav>
+        <!-- MAIN MENU BUTTONS -->
+        <main class="ui-main">
+            <nav class="menu-container">
+                <button class="menu-btn" onclick="createGame()">
+                    <span>Spiel Erstellen</span>
+                    <span class="menu-btn-icon">➔</span>
+                </button>
+                
+                <button class="menu-btn" onclick="joinGame()">
+                    <span>Spiel Beitreten</span>
+                    <span class="menu-btn-icon">➔</span>
+                </button>
+                
+                <button class="menu-btn menu-btn--secondary" onclick="openSettings()">
+                    <span>Einstellungen</span>
+                    <span class="menu-btn-icon">⚙</span>
+                </button>
+                
+                <button class="menu-btn menu-btn--secondary" onclick="openInstructions()">
+                    <span>Anleitung</span>
+                    <span class="menu-btn-icon">📜</span>
+                </button>
+            </nav>
+        </main>
 
-        <footer class="footer-info">
-            <p>Verbinde dich mit deinem Smartphone als Controller.</p>
-            <span class="version">v1.0 • RAINY NOIR EDITION</span>
+        <!-- FOOTER STATUS -->
+        <footer class="ui-footer">
+            <p class="footer-info">Verbinde dich mit deinem Smartphone als Controller.</p>
+            <div class="connection-status">
+                <span class="status-dot"></span>
+                <span>Server Bereit</span>
+            </div>
         </footer>
-    </main>
 
+    </div>
+
+    <!-- JavaScript Modul Start -->
     <script type="module" src="script.js?v=6000"></script>
-
 </body>
 </html>
