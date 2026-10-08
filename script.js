@@ -9,8 +9,8 @@ animate();
 
 function init() {
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x040407);
-    scene.fog = new THREE.FogExp2(0x040407, 0.035);
+    scene.background = new THREE.Color(0x05050a);
+    scene.fog = new THREE.FogExp2(0x05050a, 0.035);
 
     camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
     camera.position.set(0, 1.6, 8.5);
@@ -19,42 +19,9 @@ function init() {
     renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: false });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.1;
 
     setupLighting();
-    /* 1. EDLER, REALISTISCHER DIELENBODEN MIT TEXTUREN */
-function createProceduralRealisticFloor() {
-    const textureLoader = new THREE.TextureLoader();
-
-    // Pfade explizit mit './' angeben
-    const colorMap = textureLoader.load('./color.jpg', () => { renderer.render(scene, camera); });
-    const normalMap = textureLoader.load('./normal.jpg', () => { renderer.render(scene, camera); });
-    const roughnessMap = textureLoader.load('./roughness.jpg', () => { renderer.render(scene, camera); });
-
-    [colorMap, normalMap, roughnessMap].forEach(tex => {
-        tex.wrapS = THREE.RepeatWrapping;
-        tex.wrapT = THREE.RepeatWrapping;
-        tex.repeat.set(4, 3);
-    });
-
-    const floorMat = new THREE.MeshStandardMaterial({
-        map: colorMap,
-        normalMap: normalMap,
-        roughnessMap: roughnessMap,
-        roughness: 0.35,
-        metalness: 0.1
-    });
-
-    const floorGeo = new THREE.PlaneGeometry(30, 20);
-    const floor = new THREE.Mesh(floorGeo, floorMat);
-    floor.rotation.x = -Math.PI / 2;
-    floor.position.y = -1.2;
-    
-    scene.add(floor);
-}
-
-
+    createProceduralRealisticFloor();
     createGroundedDetailedCrate();
     createLargeAtmosphericWindow();
 
@@ -67,16 +34,18 @@ function createProceduralRealisticFloor() {
 }
 
 function setupLighting() {
-    const ambientLight = new THREE.AmbientLight(0x222538, 1.2);
+    const ambientLight = new THREE.AmbientLight(0x33334e, 1.8);
     scene.add(ambientLight);
 
-    const warmSpot = new THREE.SpotLight(0xffb866, 180, 18, Math.PI / 3.5, 0.6);
+    // Warmes Licht auf den Boden
+    const warmSpot = new THREE.SpotLight(0xffb866, 220, 20, Math.PI / 3.5, 0.6);
     warmSpot.position.set(-3.5, 4.5, 4);
     warmSpot.target.position.set(0, -1.2, 0);
     scene.add(warmSpot);
     scene.add(warmSpot.target);
 
-    const boxSpot = new THREE.SpotLight(0xffaa55, 120, 12, Math.PI / 4, 0.5);
+    // Kisten-Licht
+    const boxSpot = new THREE.SpotLight(0xffaa55, 160, 15, Math.PI / 4, 0.5);
     boxSpot.position.set(3, 4, 3);
     boxSpot.target.position.set(2, -1.2, 0);
     scene.add(boxSpot);
@@ -87,35 +56,51 @@ function setupLighting() {
     scene.add(lightningLight);
 }
 
-/* 1. EDLER, REALISTISCHER DIELENBODEN MIT ECHTEN TEXTUREN */
+/* 1. KRAFTVOLLER HOLZBODEN (BILD-UNABHÄNGIG) */
 function createProceduralRealisticFloor() {
+    const floorGroup = new THREE.Group();
+
+    // Dielen-Struktur & Grundmaterial
+    const floorGeo = new THREE.PlaneGeometry(30, 20);
+    const floorMat = new THREE.MeshStandardMaterial({
+        color: 0x4a2c17, // Schöne warme Holzfarbe
+        roughness: 0.35,  // Glanz im Licht
+        metalness: 0.05
+    });
+
+    // Versuche Texturen zu laden, falls verfügbar
     const textureLoader = new THREE.TextureLoader();
-
-    // Lade die 3 heruntergeladenen Bilddateien aus deinem Ordner
-    const colorMap = textureLoader.load('color.jpg');
-    const normalMap = textureLoader.load('normal.jpg');
-    const roughnessMap = textureLoader.load('roughness.jpg');
-
-    // Kachelung/Größe der Dielen einstellen
-    [colorMap, normalMap, roughnessMap].forEach(tex => {
+    textureLoader.load('./color.jpg', (tex) => {
         tex.wrapS = THREE.RepeatWrapping;
         tex.wrapT = THREE.RepeatWrapping;
-        tex.repeat.set(6, 4);
+        tex.repeat.set(5, 3);
+        floorMat.map = tex;
+        floorMat.needsUpdate = true;
     });
 
-    // Material mit echten 3D-Rillen und Lichtreflexionen
-    const floorMat = new THREE.MeshStandardMaterial({
-        map: colorMap,
-        normalMap: normalMap,       // Erzeugt echte 3D-Tiefe im Licht
-        roughnessMap: roughnessMap, // Erzeugt den echten Glanz
+    textureLoader.load('./normal.jpg', (tex) => {
+        tex.wrapS = THREE.RepeatWrapping;
+        tex.wrapT = THREE.RepeatWrapping;
+        tex.repeat.set(5, 3);
+        floorMat.normalMap = tex;
+        floorMat.needsUpdate = true;
     });
 
-    const floorGeo = new THREE.PlaneGeometry(30, 20);
     const floor = new THREE.Mesh(floorGeo, floorMat);
     floor.rotation.x = -Math.PI / 2;
     floor.position.y = -1.2;
-    
-    scene.add(floor);
+    floorGroup.add(floor);
+
+    // Dielen-Schattenlinien für echte Holzplanken-Optik
+    const lineMat = new THREE.MeshBasicMaterial({ color: 0x0f0804 });
+    for (let x = -15; x <= 15; x += 0.8) {
+        const lineGeo = new THREE.BoxGeometry(0.02, 0.01, 20);
+        const line = new THREE.Mesh(lineGeo, lineMat);
+        line.position.set(x, -1.195, 0);
+        floorGroup.add(line);
+    }
+
+    scene.add(floorGroup);
 }
 
 /* 2. HOCHDETAILLIERTE KISTE (FEST AUF DEM BODEN) */
@@ -124,22 +109,21 @@ function createGroundedDetailedCrate() {
 
     const w = 2.2, h = 2.2, d = 2.2;
 
-    const shadowGeo = new THREE.PlaneGeometry(3.2, 3.2);
-    const shadowMat = new THREE.MeshBasicMaterial({
-        color: 0x000000,
-        transparent: true,
-        opacity: 0.75
-    });
+    // Schattenfleck direkt unter der Kiste
+    const shadowGeo = new THREE.PlaneGeometry(3.5, 3.5);
+    const shadowMat = new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.8 });
     const shadow = new THREE.Mesh(shadowGeo, shadowMat);
     shadow.rotation.x = -Math.PI / 2;
     shadow.position.set(2.0, -1.19, -0.2);
     scene.add(shadow);
 
+    // Kisten-Körper
     const boxGeo = new THREE.BoxGeometry(w, h, d);
-    const boxMat = new THREE.MeshStandardMaterial({ color: 0x5c3619, roughness: 0.55 });
+    const boxMat = new THREE.MeshStandardMaterial({ color: 0x6e401f, roughness: 0.5 });
     const crateBody = new THREE.Mesh(boxGeo, boxMat);
     partyBoxGroup.add(crateBody);
 
+    // Metall-Ecken
     const metalMat = new THREE.MeshStandardMaterial({ color: 0x1f1f26, roughness: 0.3, metalness: 0.85 });
     const cornerGeo = new THREE.BoxGeometry(0.38, 0.38, 0.38);
 
@@ -153,15 +137,16 @@ function createGroundedDetailedCrate() {
         });
     });
 
-    const frameMat = new THREE.MeshStandardMaterial({ color: 0x422612, roughness: 0.6 });
+    // Diagonale Holzleiste VORNE
+    const frameMat = new THREE.MeshStandardMaterial({ color: 0x4a2b15, roughness: 0.6 });
     const diagGeo = new THREE.BoxGeometry(w * 1.25, 0.22, 0.08);
     const diag = new THREE.Mesh(diagGeo, frameMat);
     diag.position.z = d / 2 + 0.02;
     diag.rotation.z = Math.PI / 4;
     partyBoxGroup.add(diag);
 
-    const boxBottomY = -1.2 + (h / 2);
-    partyBoxGroup.position.set(2.0, boxBottomY, -0.2);
+    // Bündig auf dem Boden platziert
+    partyBoxGroup.position.set(2.0, -0.1, -0.2);
     partyBoxGroup.rotation.set(0, -0.45, 0);
 
     scene.add(partyBoxGroup);
@@ -177,87 +162,3 @@ function createLargeAtmosphericWindow() {
 
     const glassGeo = new THREE.PlaneGeometry(4.4, 3.2);
     const glassMat = new THREE.MeshStandardMaterial({
-        color: 0x1c2d42,
-        roughness: 0.1,
-        transparent: true,
-        opacity: 0.85
-    });
-    const glass = new THREE.Mesh(glassGeo, glassMat);
-    glass.position.z = 0.02;
-    windowGroup.add(glass);
-
-    const barMat = new THREE.MeshStandardMaterial({ color: 0x0a0a0f, roughness: 0.8 });
-    
-    [-1.1, 0, 1.1].forEach(x => {
-        const vBar = new THREE.Mesh(new THREE.BoxGeometry(0.12, 3.2, 0.2), barMat);
-        vBar.position.set(x, 0, 0.05);
-        windowGroup.add(vBar);
-    });
-
-    [-0.8, 0, 0.8].forEach(y => {
-        const hBar = new THREE.Mesh(new THREE.BoxGeometry(4.4, 0.12, 0.2), barMat);
-        hBar.position.set(0, y, 0.05);
-        windowGroup.add(hBar);
-    });
-
-    windowGroup.position.set(1.8, 2.3, -4.2);
-    scene.add(windowGroup);
-
-    const rainCount = 800;
-    const rainGeo = new THREE.BufferGeometry();
-    const rainPos = new Float32Array(rainCount * 3);
-
-    for (let i = 0; i < rainCount * 3; i += 3) {
-        rainPos[i] = 1.8 + (Math.random() - 0.5) * 6;
-        rainPos[i + 1] = Math.random() * 5 - 1;
-        rainPos[i + 2] = -4.0 + (Math.random() - 0.5) * 1.2;
-    }
-
-    rainGeo.setAttribute('position', new THREE.BufferAttribute(rainPos, 3));
-
-    const rainMat = new THREE.PointsMaterial({
-        color: 0x88bbff,
-        size: 0.045,
-        transparent: true,
-        opacity: 0.75
-    });
-
-    rainParticles = new THREE.Points(rainGeo, rainMat);
-    scene.add(rainParticles);
-}
-
-function animate() {
-    requestAnimationFrame(animate);
-
-    if (rainParticles) {
-        const positions = rainParticles.geometry.attributes.position.array;
-        for (let i = 1; i < positions.length; i += 3) {
-            positions[i] -= 0.18;
-            if (positions[i] < -1.2) {
-                positions[i] = 4.2;
-            }
-        }
-        rainParticles.geometry.attributes.position.needsUpdate = true;
-    }
-
-    if (Math.random() > 0.988) {
-        lightningLight.intensity = 150 + Math.random() * 180;
-    } else {
-        lightningLight.intensity *= 0.82;
-    }
-
-    camera.position.x += (mouseX * 0.35 - camera.position.x) * 0.04;
-    camera.position.y += (-mouseY * 0.2 + 1.6 - camera.position.y) * 0.04;
-    camera.lookAt(0, 0.4, 0);
-
-    renderer.render(scene, camera);
-}
-
-function resize() {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-}
-
-window.createGame = () => alert("🎮 Spiel wird erstellt...");
-window.joinGame = () => alert("🚪 Lobby beitreten...");
