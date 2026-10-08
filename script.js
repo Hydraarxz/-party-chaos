@@ -23,26 +23,27 @@ function init() {
     renderer.toneMappingExposure = 1.1;
 
     setupLighting();
-    /* 1. EDLER, REALISTISCHER DIELENBODEN MIT ECHTEN TEXTUREN */
+    /* 1. EDLER, REALISTISCHER DIELENBODEN MIT TEXTUREN */
 function createProceduralRealisticFloor() {
     const textureLoader = new THREE.TextureLoader();
 
-    // Lädt die Bilder und gibt eine Warnung aus, falls der Pfad falsch ist
-    const colorMap = textureLoader.load('color.jpg', undefined, undefined, () => console.error("Bild 'color.jpg' nicht gefunden!"));
-    const normalMap = textureLoader.load('normal.jpg', undefined, undefined, () => console.error("Bild 'normal.jpg' nicht gefunden!"));
-    const roughnessMap = textureLoader.load('roughness.jpg', undefined, undefined, () => console.error("Bild 'roughness.jpg' nicht gefunden!"));
+    // Pfade explizit mit './' angeben
+    const colorMap = textureLoader.load('./color.jpg', () => { renderer.render(scene, camera); });
+    const normalMap = textureLoader.load('./normal.jpg', () => { renderer.render(scene, camera); });
+    const roughnessMap = textureLoader.load('./roughness.jpg', () => { renderer.render(scene, camera); });
 
     [colorMap, normalMap, roughnessMap].forEach(tex => {
         tex.wrapS = THREE.RepeatWrapping;
         tex.wrapT = THREE.RepeatWrapping;
-        tex.repeat.set(6, 4);
+        tex.repeat.set(4, 3);
     });
 
     const floorMat = new THREE.MeshStandardMaterial({
         map: colorMap,
         normalMap: normalMap,
         roughnessMap: roughnessMap,
-        color: 0x5c3619 // Ersatzfarbe, falls Texturen noch laden
+        roughness: 0.35,
+        metalness: 0.1
     });
 
     const floorGeo = new THREE.PlaneGeometry(30, 20);
@@ -52,6 +53,7 @@ function createProceduralRealisticFloor() {
     
     scene.add(floor);
 }
+
 
     createGroundedDetailedCrate();
     createLargeAtmosphericWindow();
