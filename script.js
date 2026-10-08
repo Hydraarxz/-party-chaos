@@ -18,7 +18,10 @@ const CONFIG = {
 };
 
 window.addEventListener("DOMContentLoaded", () => {
-    initEngine();
+    initEngine(); const { partyBoxGroup, shadowMesh } = createUltraDetailedCrate();
+scene.add(shadowMesh);
+scene.add(partyBoxGroup);
+
     animateEngine();
 });
 
