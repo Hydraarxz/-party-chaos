@@ -1,119 +1,259 @@
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js";
 
-let scene, camera, renderer;
-let partyBoxGroup, rainParticles, lightningLight;
-let mouseX = 0, mouseY = 0;
+// ========================================
+// PARTY CHAOS – 3D SCENE
+// ========================================
+
+let scene;
+let camera;
+let renderer;
+
+let rainParticles;
+let lightningLight;
+
+let mouseX = 0;
+let mouseY = 0;
+
+let clock;
+
+// ========================================
+// START
+// ========================================
 
 init();
 animate();
 
 function init() {
+    clock = new THREE.Clock();
+
+    // Szene
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0x040407);
-    scene.fog = new THREE.FogExp2(0x040407, 0.035);
+    scene.fog = new THREE.FogExp2(0x040407, 0.025);
 
-    camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+    // Kamera
+    camera = new THREE.PerspectiveCamera(
+        45,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        100
+    );
+
     camera.position.set(0, 1.6, 8.5);
+    camera.lookAt(0, 0.4, 0);
 
+    // Canvas aus deiner index.html
     const canvas = document.getElementById("stage3d");
+
+    if (!canvas) {
+        console.error(
+            'PARTY CHAOS: Das Canvas mit id="stage3d" wurde nicht gefunden.'
+        );
+        return;
+    }
+
+    // Renderer
     renderer = new THREE.WebGLRenderer({
-    canvas: canvas,
-    antialias: true,
-    alpha: false
-});
+        canvas: canvas,
+        antialias: true,
+        alpha: false
+    });
 
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(
+        window.innerWidth,
+        window.innerHeight
+    );
 
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.setPixelRatio(
+        Math.min(window.devicePixelRatio, 2)
+    );
 
-renderer.outputColorSpace = THREE.SRGBColorSpace;
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.15;
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.15;
+
+    // Echte Schatten
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+    // Szene aufbauen
     setupLighting();
-    createProceduralRealisticFloor(); // Lädt deine echten Bilder für den Boden
+    createRealisticFloor();
     createGroundedDetailedCrate();
     createLargeAtmosphericWindow();
 
-    window.addEventListener("mousemove", (e) => {
-        mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
-        mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+    // Mausbewegung
+    window.addEventListener("mousemove", (event) => {
+        mouseX =
+            (event.clientX / window.innerWidth - 0.5) * 2;
+
+        mouseY =
+            (event.clientY / window.innerHeight - 0.5) * 2;
     });
+
+    // Touch-Steuerung für iPad
+    window.addEventListener(
+        "touchmove",
+        (event) => {
+            if (!event.touches.length) return;
+
+            const touch = event.touches[0];
+
+            mouseX =
+                (touch.clientX / window.innerWidth - 0.5) * 2;
+
+            mouseY =
+                (touch.clientY / window.innerHeight - 0.5) * 2;
+        },
+        { passive: true }
+    );
 
     window.addEventListener("resize", resize);
 }
 
+// ========================================
+// LICHTER
+// ========================================
+
 function setupLighting() {
-    const ambientLight = new THREE.AmbientLight(0x222538, 1.2);
+    // Grundlicht
+    const ambientLight = new THREE.AmbientLight(
+        0x222538,
+        1.2
+    );
+
     scene.add(ambientLight);
 
-    const warmSpot = new THREE.SpotLight(0xffb866, 180, 18, Math.PI / 3.5, 0.6);
+    // Warmes Hauptlicht
+    const warmSpot = new THREE.SpotLight(
+        0xffb866,
+        180,
+        25,
+        Math.PI / 3.5,
+        0.6
+    );
+
     warmSpot.position.set(-3.5, 4.5, 4);
     warmSpot.target.position.set(0, -1.2, 0);
+
+    warmSpot.castShadow = true;
+    warmSpot.shadow.mapSize.set(1024, 1024);
+    warmSpot.shadow.bias = -0.0001;
+
     scene.add(warmSpot);
     scene.add(warmSpot.target);
 
-    const boxSpot = new THREE.SpotLight(0xffaa55, 120, 12, Math.PI / 4, 0.5);
+    // Zweiter Spot
+    const boxSpot = new THREE.SpotLight(
+        0xffaa55,
+        120,
+        20,
+        Math.PI / 4,
+        0.5
+    );
+
     boxSpot.position.set(3, 4, 3);
     boxSpot.target.position.set(2, -1.2, 0);
+
+    boxSpot.castShadow = true;
+    boxSpot.shadow.mapSize.set(1024, 1024);
+    boxSpot.shadow.bias = -0.0001;
+
     scene.add(boxSpot);
     scene.add(boxSpot.target);
 
-    lightningLight = new THREE.PointLight(0x88ccff, 0, 30);
+    // Kühles Licht von hinten
+    const blueLight = new THREE.PointLight(
+        0x4466ff,
+        35,
+        18
+    );
+
+    blueLight.position.set(-3, 1.5, -3);
+    scene.add(blueLight);
+
+    // Lichtblitze
+    lightningLight = new THREE.PointLight(
+        0x88ccff,
+        0,
+        30
+    );
+
     lightningLight.position.set(1.5, 2.5, -4.5);
     scene.add(lightningLight);
 }
 
-/* 1. EDLER, REALISTISCHER DIELENBODEN MIT ECHTEN TEXTUREN */
-function createProceduralRealisticFloor() {
+// ========================================
+// REALISTISCHER TEXTURBODEN
+// ========================================
+
+function createRealisticFloor() {
     const loader = new THREE.TextureLoader();
 
-    const colorMap = loader.load("color.jpg");
-    const normalMap = loader.load("normal.jpg");
-    const roughnessMap = loader.load("roughness.jpg");
+    const colorMap = loader.load(
+        "./color.jpg",
+        () => console.log("Boden: Color-Textur geladen"),
+        undefined,
+        () => console.error("Boden: color.jpg konnte nicht geladen werden")
+    );
 
-    // Richtige Farbbehandlung
+    const normalMap = loader.load(
+        "./normal.jpg",
+        () => console.log("Boden: Normal-Textur geladen"),
+        undefined,
+        () => console.error("Boden: normal.jpg konnte nicht geladen werden")
+    );
+
+    const roughnessMap = loader.load(
+        "./roughness.jpg",
+        () => console.log("Boden: Roughness-Textur geladen"),
+        undefined,
+        () => console.error("Boden: roughness.jpg konnte nicht geladen werden")
+    );
+
+    // Farbtextur korrekt behandeln
     colorMap.colorSpace = THREE.SRGBColorSpace;
 
-    // Textur deutlich öfter wiederholen
-    colorMap.wrapS = THREE.RepeatWrapping;
-    colorMap.wrapT = THREE.RepeatWrapping;
+    // Texturen wiederholen
+    const textures = [
+        colorMap,
+        normalMap,
+        roughnessMap
+    ];
 
-    normalMap.wrapS = THREE.RepeatWrapping;
-    normalMap.wrapT = THREE.RepeatWrapping;
+    textures.forEach((texture) => {
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.RepeatWrapping;
+        texture.repeat.set(8, 6);
+        texture.anisotropy =
+            renderer.capabilities.getMaxAnisotropy();
+    });
 
-    roughnessMap.wrapS = THREE.RepeatWrapping;
-    roughnessMap.wrapT = THREE.RepeatWrapping;
-
-    colorMap.repeat.set(10, 7);
-    normalMap.repeat.set(10, 7);
-    roughnessMap.repeat.set(10, 7);
-
-    // Schärfere Textur bei schrägem Blickwinkel
-    colorMap.anisotropy = renderer.capabilities.getMaxAnisotropy();
-    normalMap.anisotropy = renderer.capabilities.getMaxAnisotropy();
-    roughnessMap.anisotropy = renderer.capabilities.getMaxAnisotropy();
-
-    const material = new THREE.MeshPhysicalMaterial({
+    // Material
+    const floorMaterial = new THREE.MeshPhysicalMaterial({
         map: colorMap,
         normalMap: normalMap,
         roughnessMap: roughnessMap,
 
-        // Material selbst
-        roughness: 0.28,
-        metalness: 0.15,
+        roughness: 0.3,
+        metalness: 0.12,
 
-        // leichte glänzende Oberfläche
-        clearcoat: 0.35,
-        clearcoatRoughness: 0.18,
+        clearcoat: 0.4,
+        clearcoatRoughness: 0.2,
 
-        normalScale: new THREE.Vector2(1.4, 1.4)
+        normalScale: new THREE.Vector2(1.3, 1.3)
     });
 
-    const geometry = new THREE.PlaneGeometry(30, 20, 128, 128);
+    // Boden
+    const floorGeometry = new THREE.PlaneGeometry(
+        30,
+        20
+    );
 
-    const floor = new THREE.Mesh(geometry, material);
+    const floor = new THREE.Mesh(
+        floorGeometry,
+        floorMaterial
+    );
 
     floor.rotation.x = -Math.PI / 2;
     floor.position.y = -1.2;
@@ -122,175 +262,307 @@ function createProceduralRealisticFloor() {
 
     scene.add(floor);
 }
-    const textureLoader = new THREE.TextureLoader();
 
-    // Lade die 3 heruntergeladenen Bilddateien aus deinem Ordner
-    const colorMap = textureLoader.load('color.jpg');
-    const normalMap = textureLoader.load('normal.jpg');
-    const roughnessMap = textureLoader.load('roughness.jpg');
+// ========================================
+// DETAILLIERTE HOLZKISTE
+// ========================================
 
-    // Kachelung/Größe der Dielen einstellen
-    [colorMap, normalMap, roughnessMap].forEach(tex => {
-        tex.wrapS = THREE.RepeatWrapping;
-        tex.wrapT = THREE.RepeatWrapping;
-        tex.repeat.set(6, 4);
-    });
-
-    // Material mit echten 3D-Rillen und Lichtreflexionen
-    const floorMat = new THREE.MeshStandardMaterial({
-        map: colorMap,
-        normalMap: normalMap,       // Erzeugt echte 3D-Tiefe im Licht
-        roughnessMap: roughnessMap, // Erzeugt den echten Glanz
-    });
-
-    const floorGeo = new THREE.PlaneGeometry(30, 20);
-    const floor = new THREE.Mesh(floorGeo, floorMat);
-    floor.rotation.x = -Math.PI / 2;
-    floor.position.y = -1.2;
-    
-    scene.add(floor);
-}
-
-/* 2. HOCHDETAILLIERTE KISTE (FEST AUF DEM BODEN) */
 function createGroundedDetailedCrate() {
-    partyBoxGroup = new THREE.Group();
+    const group = new THREE.Group();
 
-    const w = 2.2, h = 2.2, d = 2.2;
+    const width = 2.2;
+    const height = 2.2;
+    const depth = 2.2;
 
-    const shadowGeo = new THREE.PlaneGeometry(3.2, 3.2);
-    const shadowMat = new THREE.MeshBasicMaterial({
-        color: 0x000000,
-        transparent: true,
-        opacity: 0.75
+    // Holzmaterial
+    const woodMaterial = new THREE.MeshStandardMaterial({
+        color: 0x68401f,
+        roughness: 0.72,
+        metalness: 0.02
     });
-    const shadow = new THREE.Mesh(shadowGeo, shadowMat);
-    shadow.rotation.x = -Math.PI / 2;
-    shadow.position.set(2.0, -1.19, -0.2);
-    scene.add(shadow);
 
-    const boxGeo = new THREE.BoxGeometry(w, h, d);
-    const boxMat = new THREE.MeshStandardMaterial({ color: 0x5c3619, roughness: 0.55 });
-    const crateBody = new THREE.Mesh(boxGeo, boxMat);
-    partyBoxGroup.add(crateBody);
+    // Kiste
+    const body = new THREE.Mesh(
+        new THREE.BoxGeometry(width, height, depth),
+        woodMaterial
+    );
 
-    const metalMat = new THREE.MeshStandardMaterial({ color: 0x1f1f26, roughness: 0.3, metalness: 0.85 });
-    const cornerGeo = new THREE.BoxGeometry(0.38, 0.38, 0.38);
+    body.castShadow = true;
+    body.receiveShadow = true;
 
-    [-1, 1].forEach(x => {
-        [-1, 1].forEach(y => {
-            [-1, 1].forEach(z => {
-                const corner = new THREE.Mesh(cornerGeo, metalMat);
-                corner.position.set(x * (w / 2), y * (h / 2), z * (d / 2));
-                partyBoxGroup.add(corner);
+    group.add(body);
+
+    // Metallbeschläge
+    const metalMaterial = new THREE.MeshStandardMaterial({
+        color: 0x292a30,
+        roughness: 0.32,
+        metalness: 0.85
+    });
+
+    const cornerGeometry = new THREE.BoxGeometry(
+        0.3,
+        0.3,
+        0.3
+    );
+
+    [-1, 1].forEach((x) => {
+        [-1, 1].forEach((y) => {
+            [-1, 1].forEach((z) => {
+                const corner = new THREE.Mesh(
+                    cornerGeometry,
+                    metalMaterial
+                );
+
+                corner.position.set(
+                    x * (width / 2),
+                    y * (height / 2),
+                    z * (depth / 2)
+                );
+
+                corner.castShadow = true;
+                group.add(corner);
             });
         });
     });
 
-    const frameMat = new THREE.MeshStandardMaterial({ color: 0x422612, roughness: 0.6 });
-    const diagGeo = new THREE.BoxGeometry(w * 1.25, 0.22, 0.08);
-    const diag = new THREE.Mesh(diagGeo, frameMat);
-    diag.position.z = d / 2 + 0.02;
-    diag.rotation.z = Math.PI / 4;
-    partyBoxGroup.add(diag);
+    // Holzstreben vorne
+    const beamMaterial = new THREE.MeshStandardMaterial({
+        color: 0x422612,
+        roughness: 0.65
+    });
 
-    const boxBottomY = -1.2 + (h / 2);
-    partyBoxGroup.position.set(2.0, boxBottomY, -0.2);
-    partyBoxGroup.rotation.set(0, -0.45, 0);
+    const beamGeometry = new THREE.BoxGeometry(
+        width * 1.15,
+        0.16,
+        0.12
+    );
 
-    scene.add(partyBoxGroup);
+    const beam1 = new THREE.Mesh(
+        beamGeometry,
+        beamMaterial
+    );
+
+    beam1.position.z = depth / 2 + 0.04;
+    beam1.rotation.z = Math.PI / 4;
+    beam1.castShadow = true;
+
+    group.add(beam1);
+
+    const beam2 = new THREE.Mesh(
+        beamGeometry,
+        beamMaterial
+    );
+
+    beam2.position.z = depth / 2 + 0.04;
+    beam2.rotation.z = -Math.PI / 4;
+    beam2.castShadow = true;
+
+    group.add(beam2);
+
+    // Position auf dem Boden
+    group.position.set(
+        2,
+        -1.2 + height / 2,
+        -0.2
+    );
+
+    group.rotation.y = -0.45;
+
+    scene.add(group);
 }
 
-/* 3. FENSTER MIT REGEN */
+// ========================================
+// FENSTER MIT REGEN
+// ========================================
+
 function createLargeAtmosphericWindow() {
     const windowGroup = new THREE.Group();
 
-    const frameMat = new THREE.MeshStandardMaterial({ color: 0x111118, roughness: 0.7 });
-    const outerFrame = new THREE.Mesh(new THREE.BoxGeometry(4.8, 3.6, 0.25), frameMat);
+    // Fensterrahmen
+    const frameMaterial = new THREE.MeshStandardMaterial({
+        color: 0x111118,
+        roughness: 0.7,
+        metalness: 0.35
+    });
+
+    const outerFrame = new THREE.Mesh(
+        new THREE.BoxGeometry(4.8, 3.6, 0.25),
+        frameMaterial
+    );
+
+    outerFrame.castShadow = true;
     windowGroup.add(outerFrame);
 
-    const glassGeo = new THREE.PlaneGeometry(4.4, 3.2);
-    const glassMat = new THREE.MeshStandardMaterial({
+    // Glas
+    const glassMaterial = new THREE.MeshPhysicalMaterial({
         color: 0x1c2d42,
-        roughness: 0.1,
+        roughness: 0.16,
+        metalness: 0.15,
         transparent: true,
-        opacity: 0.85
+        opacity: 0.9,
+        clearcoat: 1,
+        clearcoatRoughness: 0.1
     });
-    const glass = new THREE.Mesh(glassGeo, glassMat);
-    glass.position.z = 0.02;
+
+    const glass = new THREE.Mesh(
+        new THREE.PlaneGeometry(4.4, 3.2),
+        glassMaterial
+    );
+
+    glass.position.z = 0.14;
     windowGroup.add(glass);
 
-    const barMat = new THREE.MeshStandardMaterial({ color: 0x0a0a0f, roughness: 0.8 });
-    
-    [-1.1, 0, 1.1].forEach(x => {
-        const vBar = new THREE.Mesh(new THREE.BoxGeometry(0.12, 3.2, 0.2), barMat);
-        vBar.position.set(x, 0, 0.05);
-        windowGroup.add(vBar);
+    // Vertikale Streben
+    const barMaterial = new THREE.MeshStandardMaterial({
+        color: 0x0a0a0f,
+        roughness: 0.8,
+        metalness: 0.3
     });
 
-    [-0.8, 0, 0.8].forEach(y => {
-        const hBar = new THREE.Mesh(new THREE.BoxGeometry(4.4, 0.12, 0.2), barMat);
-        hBar.position.set(0, y, 0.05);
-        windowGroup.add(hBar);
+    [-1.1, 0, 1.1].forEach((x) => {
+        const bar = new THREE.Mesh(
+            new THREE.BoxGeometry(0.12, 3.2, 0.2),
+            barMaterial
+        );
+
+        bar.position.set(x, 0, 0.2);
+        bar.castShadow = true;
+
+        windowGroup.add(bar);
+    });
+
+    // Horizontale Streben
+    [-0.8, 0, 0.8].forEach((y) => {
+        const bar = new THREE.Mesh(
+            new THREE.BoxGeometry(4.4, 0.12, 0.2),
+            barMaterial
+        );
+
+        bar.position.set(0, y, 0.2);
+        bar.castShadow = true;
+
+        windowGroup.add(bar);
     });
 
     windowGroup.position.set(1.8, 2.3, -4.2);
+
     scene.add(windowGroup);
 
+    // Regenpartikel
     const rainCount = 800;
-    const rainGeo = new THREE.BufferGeometry();
-    const rainPos = new Float32Array(rainCount * 3);
 
-    for (let i = 0; i < rainCount * 3; i += 3) {
-        rainPos[i] = 1.8 + (Math.random() - 0.5) * 6;
-        rainPos[i + 1] = Math.random() * 5 - 1;
-        rainPos[i + 2] = -4.0 + (Math.random() - 0.5) * 1.2;
+    const rainGeometry = new THREE.BufferGeometry();
+    const positions = new Float32Array(rainCount * 3);
+
+    for (let i = 0; i < rainCount; i++) {
+        positions[i * 3] =
+            1.8 + (Math.random() - 0.5) * 6;
+
+        positions[i * 3 + 1] =
+            Math.random() * 5 - 1;
+
+        positions[i * 3 + 2] =
+            -4 + (Math.random() - 0.5) * 1.2;
     }
 
-    rainGeo.setAttribute('position', new THREE.BufferAttribute(rainPos, 3));
+    rainGeometry.setAttribute(
+        "position",
+        new THREE.BufferAttribute(positions, 3)
+    );
 
-    const rainMat = new THREE.PointsMaterial({
+    const rainMaterial = new THREE.PointsMaterial({
         color: 0x88bbff,
-        size: 0.045,
+        size: 0.035,
         transparent: true,
-        opacity: 0.75
+        opacity: 0.75,
+        depthWrite: false
     });
 
-    rainParticles = new THREE.Points(rainGeo, rainMat);
+    rainParticles = new THREE.Points(
+        rainGeometry,
+        rainMaterial
+    );
+
     scene.add(rainParticles);
 }
+
+// ========================================
+// ANIMATION
+// ========================================
 
 function animate() {
     requestAnimationFrame(animate);
 
+    if (!renderer || !scene || !camera) return;
+
+    const delta = Math.min(clock.getDelta(), 0.05);
+
+    // Regen bewegen
     if (rainParticles) {
-        const positions = rainParticles.geometry.attributes.position.array;
+        const positions =
+            rainParticles.geometry.attributes.position.array;
+
         for (let i = 1; i < positions.length; i += 3) {
-            positions[i] -= 0.18;
+            positions[i] -= 3.5 * delta;
+
             if (positions[i] < -1.2) {
                 positions[i] = 4.2;
             }
         }
+
         rainParticles.geometry.attributes.position.needsUpdate = true;
     }
 
-    if (Math.random() > 0.988) {
-        lightningLight.intensity = 150 + Math.random() * 180;
+    // Gelegentliche Lichtblitze
+    if (Math.random() > 0.992) {
+        lightningLight.intensity =
+            100 + Math.random() * 160;
     } else {
-        lightningLight.intensity *= 0.82;
+        lightningLight.intensity *= 0.85;
     }
 
-    camera.position.x += (mouseX * 0.35 - camera.position.x) * 0.04;
-    camera.position.y += (-mouseY * 0.2 + 1.6 - camera.position.y) * 0.04;
+    // Sanfte Kamerabewegung
+    camera.position.x +=
+        (mouseX * 0.35 - camera.position.x) * 0.04;
+
+    camera.position.y +=
+        (1.6 - mouseY * 0.2 - camera.position.y) * 0.04;
+
     camera.lookAt(0, 0.4, 0);
 
     renderer.render(scene, camera);
 }
 
+// ========================================
+// FENSTERGRÖSSE
+// ========================================
+
 function resize() {
-    camera.aspect = window.innerWidth / window.innerHeight;
+    if (!camera || !renderer) return;
+
+    camera.aspect =
+        window.innerWidth / window.innerHeight;
+
     camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    renderer.setSize(
+        window.innerWidth,
+        window.innerHeight
+    );
+
+    renderer.setPixelRatio(
+        Math.min(window.devicePixelRatio, 2)
+    );
 }
 
-window.createGame = () => alert("🎮 Spiel wird erstellt...");
-window.joinGame = () => alert("🚪 Lobby beitreten...");
+// ========================================
+// BUTTONS
+// ========================================
+
+window.createGame = function () {
+    alert("🎮 Spiel wird erstellt...");
+};
+
+window.joinGame = function () {
+    alert("🚪 Lobby beitreten...");
+};
