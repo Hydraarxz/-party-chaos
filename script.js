@@ -5,15 +5,15 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.m
 // ============================================================================
 let scene, camera, renderer;
 let partyBoxGroup, floorGroup, windowGroup, roomGroup;
-let rainLineSystem, glassDropletsSystem, fogParticles;
-let ambientLight, windowMoonLight, crateWarmLight, lightningLight;
+let rainLineSystem;
+let ambientLight, windowMoonLight, crateWarmLight, crateSpotLight, lightningLight;
 let mouseX = 0, mouseY = 0, targetMouseX = 0, targetMouseY = 0;
 let clock = new THREE.Clock();
 
 const CONFIG = {
     camera: { fov: 42, basePos: new THREE.Vector3(0, 1.45, 8.0), lookAt: new THREE.Vector3(0, 0.25, 0) },
     window: { width: 4.2, height: 3.2, pos: new THREE.Vector3(1.8, 2.2, -4.5) },
-    rain: { streakCount: 450, dropCount: 200 }
+    rain: { streakCount: 500 }
 };
 
 window.addEventListener("DOMContentLoaded", () => {
@@ -27,7 +27,7 @@ window.addEventListener("DOMContentLoaded", () => {
 function initEngine() {
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0x010204);
-    scene.fog = new THREE.FogExp2(0x010204, 0.045);
+    scene.fog = new THREE.FogExp2(0x010204, 0.042);
 
     camera = new THREE.PerspectiveCamera(CONFIG.camera.fov, window.innerWidth / window.innerHeight, 0.1, 100);
     camera.position.copy(CONFIG.camera.basePos);
@@ -37,11 +37,12 @@ function initEngine() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 0.78;
+    renderer.toneMappingExposure = 0.85;
     renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
     setupLighting();
-    buildRoomWalls(); // Verhindert das Überlappen des Waldes!
+    buildRoomWalls();
     buildProceduralFloor();
     buildDetailedCrate();
     buildWindowAndDarkForest();
@@ -59,23 +60,29 @@ function initEngine() {
 // BELEUCHTUNG & ATMOSPHÄRE
 // ============================================================================
 function setupLighting() {
-    ambientLight = new THREE.AmbientLight(0x0a1018, 0.9);
+    ambientLight = new THREE.AmbientLight(0x121a24, 1.1);
     scene.add(ambientLight);
 
     // Kaltes Mondlicht durch das Fenster
-    windowMoonLight = new THREE.SpotLight(0x3d6494, 150, 16, Math.PI / 3.2, 0.55);
+    windowMoonLight = new THREE.SpotLight(0x3d6494, 140, 16, Math.PI / 3.2, 0.55);
     windowMoonLight.position.set(CONFIG.window.pos.x, CONFIG.window.pos.y + 0.3, CONFIG.window.pos.z + 0.2);
     windowMoonLight.target.position.set(-0.5, -1.0, 1.5);
     windowMoonLight.castShadow = true;
     scene.add(windowMoonLight);
     scene.add(windowMoonLight.target);
 
-    // Sanfter warmer Akzent auf der Kiste
-    crateWarmLight = new THREE.SpotLight(0xaa5b28, 40, 10, Math.PI / 4, 0.85);
-    crateWarmLight.position.set(3.8, 2.8, 3.2);
-    crateWarmLight.target.position.set(1.9, -0.2, -0.2);
+    // Warmes Licht direkt auf die Kiste, damit Details sichtbar sind
+    crateWarmLight = new THREE.SpotLight(0xc87038, 80, 12, Math.PI / 3.5, 0.6);
+    crateWarmLight.position.set(3.2, 2.8, 3.5);
+    crateWarmLight.target.position.set(1.9, -0.1, -0.2);
+    crateWarmLight.castShadow = true;
     scene.add(crateWarmLight);
     scene.add(crateWarmLight.target);
+
+    // Sanfter Rim-Light Effekt von hinten/oben auf die Kiste
+    crateSpotLight = new THREE.PointLight(0x4a77aa, 12, 8);
+    crateSpotLight.position.set(1.0, 1.5, -1.2);
+    scene.add(crateSpotLight);
 
     // Gewitterblitz
     lightningLight = new THREE.PointLight(0x88ccff, 0, 60);
@@ -84,7 +91,7 @@ function setupLighting() {
 }
 
 // ============================================================================
-// RAUMWÄNDE (BLOCKIERT ÜBERLAPPEN DES WALDES)
+// RAUMWÄNDE
 // ============================================================================
 function buildRoomWalls() {
     roomGroup = new THREE.Group();
@@ -94,19 +101,15 @@ function buildRoomWalls() {
     const wH = CONFIG.window.height;
     const wPos = CONFIG.window.pos;
 
-    // Wand Links vom Fenster
     const leftWall = new THREE.Mesh(new THREE.BoxGeometry(10, 10, 0.2), wallMat);
     leftWall.position.set(wPos.x - wW / 2 - 5, wPos.y, wPos.z);
-    
-    // Wand Rechts vom Fenster
+
     const rightWall = new THREE.Mesh(new THREE.BoxGeometry(10, 10, 0.2), wallMat);
     rightWall.position.set(wPos.x + wW / 2 + 5, wPos.y, wPos.z);
 
-    // Wand Oberhalb
     const topWall = new THREE.Mesh(new THREE.BoxGeometry(wW + 10, 5, 0.2), wallMat);
     topWall.position.set(wPos.x, wPos.y + wH / 2 + 2.5, wPos.z);
 
-    // Wand Unterhalb
     const botWall = new THREE.Mesh(new THREE.BoxGeometry(wW + 10, 5, 0.2), wallMat);
     botWall.position.set(wPos.x, wPos.y - wH / 2 - 2.5, wPos.z);
 
@@ -125,7 +128,7 @@ function buildProceduralFloor() {
     canvas.height = 1024;
     const ctx = canvas.getContext('2d');
 
-    ctx.fillStyle = '#1a0e07';
+    ctx.fillStyle = '#1c1008';
     ctx.fillRect(0, 0, 1024, 1024);
 
     for (let i = 0; i < 2000; i++) {
@@ -162,67 +165,137 @@ function buildProceduralFloor() {
 }
 
 // ============================================================================
-// PLASTISCHE KISTE
+// DETAILLIERTE KISTE (RESIDENT-EVIL STYLE)
 // ============================================================================
 function buildDetailedCrate() {
     partyBoxGroup = new THREE.Group();
     const w = 2.2, h = 2.2, d = 2.2;
 
+    // Contact Shadow auf dem Boden
     const shadowGeo = new THREE.PlaneGeometry(3.6, 3.6);
-    const shadowMat = new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.9 });
+    const shadowMat = new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.88 });
     const shadowMesh = new THREE.Mesh(shadowGeo, shadowMat);
     shadowMesh.rotation.x = -Math.PI / 2;
     shadowMesh.position.set(1.9, -1.192, -0.2);
     scene.add(shadowMesh);
 
-    const coreGeo = new THREE.BoxGeometry(w - 0.06, h - 0.06, d - 0.06);
-    const coreMat = new THREE.MeshStandardMaterial({ color: 0x100804, roughness: 0.95 });
+    // Textur für Holzplanken generieren
+    const woodCanvas = document.createElement('canvas');
+    woodCanvas.width = 512;
+    woodCanvas.height = 512;
+    const wCtx = woodCanvas.getContext('2d');
+    wCtx.fillStyle = '#5a341a';
+    wCtx.fillRect(0, 0, 512, 512);
+    for (let i = 0; i < 800; i++) {
+        wCtx.fillStyle = Math.random() > 0.5 ? 'rgba(0,0,0,0.18)' : 'rgba(255,255,255,0.05)';
+        wCtx.fillRect(0, Math.random() * 512, 512, Math.random() * 4 + 1);
+    }
+    const crateWoodTex = new THREE.CanvasTexture(woodCanvas);
+
+    // Materialien für Planken, Rahmen und Beschläge
+    const woodPlankMat = new THREE.MeshStandardMaterial({
+        map: crateWoodTex,
+        color: 0x6e401f,
+        roughness: 0.55
+    });
+
+    const darkFrameMat = new THREE.MeshStandardMaterial({
+        color: 0x3d2210,
+        roughness: 0.65
+    });
+
+    const reinforcedMetalMat = new THREE.MeshStandardMaterial({
+        color: 0x22222a,
+        roughness: 0.3,
+        metalness: 0.85
+    });
+
+    const boltMat = new THREE.MeshStandardMaterial({
+        color: 0x666677,
+        roughness: 0.2,
+        metalness: 0.95
+    });
+
+    // Dunkler Kern
+    const coreGeo = new THREE.BoxGeometry(w - 0.08, h - 0.08, d - 0.08);
+    const coreMat = new THREE.MeshStandardMaterial({ color: 0x120a05, roughness: 0.95 });
     partyBoxGroup.add(new THREE.Mesh(coreGeo, coreMat));
 
-    const woodPlankMat = new THREE.MeshStandardMaterial({ color: 0x482a15, roughness: 0.58 });
-    const darkFrameMat = new THREE.MeshStandardMaterial({ color: 0x2b180b, roughness: 0.68 });
-    const reinforcedMetalMat = new THREE.MeshStandardMaterial({ color: 0x1a1a22, roughness: 0.28, metalness: 0.92 });
-    const boltMat = new THREE.MeshStandardMaterial({ color: 0x505060, roughness: 0.18, metalness: 0.98 });
-
+    // Horizontal aufgesetzte Holzplanken (Vorne & Hinten)
     const plankCount = 5;
     const pHeight = (h - 0.1) / plankCount;
 
     for (let i = 0; i < plankCount; i++) {
         const yPos = -h / 2 + pHeight / 2 + i * pHeight + 0.05;
 
-        const fPlank = new THREE.Mesh(new THREE.BoxGeometry(w - 0.08, pHeight - 0.03, 0.05), woodPlankMat);
+        // Front-Planken
+        const fPlank = new THREE.Mesh(new THREE.BoxGeometry(w - 0.1, pHeight - 0.03, 0.06), woodPlankMat);
         fPlank.position.set(0, yPos, d / 2);
+        fPlank.castShadow = true;
+        fPlank.receiveShadow = true;
         partyBoxGroup.add(fPlank);
 
+        // Rückseiten-Planken
         const bPlank = fPlank.clone();
         bPlank.position.z = -d / 2;
         partyBoxGroup.add(bPlank);
+
+        // Seiten-Planken (Links & Rechts)
+        const lPlank = new THREE.Mesh(new THREE.BoxGeometry(0.06, pHeight - 0.03, d - 0.1), woodPlankMat);
+        lPlank.position.set(-w / 2, yPos, 0);
+        lPlank.castShadow = true;
+        lPlank.receiveShadow = true;
+        partyBoxGroup.add(lPlank);
+
+        const rPlank = lPlank.clone();
+        rPlank.position.x = w / 2;
+        partyBoxGroup.add(rPlank);
     }
 
-    const diagGeo = new THREE.BoxGeometry(w * 1.22, 0.16, 0.07);
-    const diagFront = new THREE.Mesh(diagGeo, darkFrameMat);
-    diagFront.position.z = d / 2 + 0.025;
-    diagFront.rotation.z = Math.PI / 4;
-    partyBoxGroup.add(diagFront);
+    // Äußere Holzrahmen & Diagonale Verstrebung VORNE
+    const frameThickness = 0.08;
+    const diagGeo = new THREE.BoxGeometry(w * 1.2, 0.18, frameThickness);
 
+    const diag1 = new THREE.Mesh(diagGeo, darkFrameMat);
+    diag1.position.z = d / 2 + 0.03;
+    diag1.rotation.z = Math.PI / 4;
+    diag1.castShadow = true;
+    partyBoxGroup.add(diag1);
+
+    const diag2 = new THREE.Mesh(diagGeo, darkFrameMat);
+    diag2.position.z = d / 2 + 0.03;
+    diag2.rotation.z = -Math.PI / 4;
+    diag2.castShadow = true;
+    partyBoxGroup.add(diag2);
+
+    // Metallene Eckschützer mit sichtbaren Nieten
     const cornerGeo = new THREE.BoxGeometry(0.38, 0.38, 0.38);
-    const rivetGeo = new THREE.CylinderGeometry(0.022, 0.022, 0.05, 10);
+    const rivetGeo = new THREE.CylinderGeometry(0.025, 0.025, 0.06, 8);
 
     [-1, 1].forEach(x => {
         [-1, 1].forEach(y => {
             [-1, 1].forEach(z => {
                 const corner = new THREE.Mesh(cornerGeo, reinforcedMetalMat);
                 corner.position.set(x * (w / 2), y * (h / 2), z * (d / 2));
+                corner.castShadow = true;
                 partyBoxGroup.add(corner);
 
+                // Niete auf der Metallecke
                 const rivet = new THREE.Mesh(rivetGeo, boltMat);
-                rivet.position.set(x * (w / 2 + 0.015), y * (h / 2), z * (d / 2 + 0.015));
+                rivet.position.set(x * (w / 2 + 0.02), y * (h / 2), z * (d / 2 + 0.02));
                 rivet.rotation.x = Math.PI / 2;
                 partyBoxGroup.add(rivet);
             });
         });
     });
 
+    // Metallischer Schloss-Beschlag vorne in der Mitte
+    const lockPlateGeo = new THREE.BoxGeometry(0.25, 0.4, 0.05);
+    const lockPlate = new THREE.Mesh(lockPlateGeo, reinforcedMetalMat);
+    lockPlate.position.set(0, 0.1, d / 2 + 0.07);
+    partyBoxGroup.add(lockPlate);
+
+    // Kiste im Raum positionieren
     partyBoxGroup.position.set(1.9, -0.09, -0.2);
     partyBoxGroup.rotation.set(0, -0.42, 0);
 
@@ -230,7 +303,7 @@ function buildDetailedCrate() {
 }
 
 // ============================================================================
-// WALD & FENSTER (NUR DURCH FENSTER SICHTBAR)
+// WALD & FENSTER
 // ============================================================================
 function buildWindowAndDarkForest() {
     windowGroup = new THREE.Group();
@@ -323,28 +396,25 @@ function buildWindowAndDarkForest() {
 }
 
 // ============================================================================
-// REALISTISCHE REGEN-STRICHE (RAIN STREAKS) & WASSERTROPFEN
+// REALISTISCHE REGEN-STRICHE (OHNE PUNKTE)
 // ============================================================================
 function buildRainPhysics() {
     const wW = CONFIG.window.width;
     const wH = CONFIG.window.height;
     const wPos = CONFIG.window.pos;
 
-    // 1. Fallende Regenstriche
     const streakGeo = new THREE.BufferGeometry();
-    const streakPos = new Float32Array(CONFIG.rain.streakCount * 6); // 2 Punkte pro Strich
+    const streakPos = new Float32Array(CONFIG.rain.streakCount * 6);
 
     for (let i = 0; i < CONFIG.rain.streakCount * 6; i += 6) {
         const rx = wPos.x + (Math.random() - 0.5) * (wW - 0.2);
         const ry = wPos.y + (Math.random() - 0.5) * (wH - 0.2);
         const rz = wPos.z - 0.05;
 
-        // Startpunkt
         streakPos[i] = rx;
         streakPos[i + 1] = ry;
         streakPos[i + 2] = rz;
 
-        // Endpunkt (Länge des Strichs)
         streakPos[i + 3] = rx - 0.04;
         streakPos[i + 4] = ry - 0.25;
         streakPos[i + 5] = rz;
@@ -359,26 +429,6 @@ function buildRainPhysics() {
 
     rainLineSystem = new THREE.LineSegments(streakGeo, streakMat);
     scene.add(rainLineSystem);
-
-    // 2. Rinnende Tropfen an der Scheibe
-    const dropGeo = new THREE.BufferGeometry();
-    const dropPos = new Float32Array(CONFIG.rain.dropCount * 3);
-    const dropData = [];
-
-    for (let i = 0; i < CONFIG.rain.dropCount * 3; i += 3) {
-        dropPos[i] = wPos.x + (Math.random() - 0.5) * (wW - 0.3);
-        dropPos[i + 1] = wPos.y + (Math.random() - 0.5) * (wH - 0.3);
-        dropPos[i + 2] = wPos.z + 0.02;
-
-        dropData.push({ speedY: Math.random() * 0.006 + 0.002, life: Math.random() });
-    }
-
-    dropGeo.setAttribute('position', new THREE.BufferAttribute(dropPos, 3));
-    const dropMat = new THREE.PointsMaterial({ color: 0xcce6ff, size: 0.045, transparent: true, opacity: 0.85 });
-
-    glassDropletsSystem = new THREE.Points(dropGeo, dropMat);
-    glassDropletsSystem.userData = dropData;
-    scene.add(glassDropletsSystem);
 }
 
 // ============================================================================
@@ -387,7 +437,6 @@ function buildRainPhysics() {
 function animateEngine() {
     requestAnimationFrame(animateEngine);
 
-    const delta = clock.getDelta();
     const wW = CONFIG.window.width;
     const wH = CONFIG.window.height;
     const wPos = CONFIG.window.pos;
@@ -400,16 +449,15 @@ function animateEngine() {
     camera.position.y = CONFIG.camera.basePos.y - mouseY * 0.12;
     camera.lookAt(CONFIG.camera.lookAt);
 
-    // 1. Regenstriche bewegen
+    // Regenstriche bewegen
     if (rainLineSystem) {
         const pos = rainLineSystem.geometry.attributes.position.array;
         for (let i = 0; i < pos.length; i += 6) {
-            pos[i + 1] -= 0.22;     // Start Y
-            pos[i + 4] -= 0.22;     // Ende Y
-            pos[i] -= 0.03;         // Wind X
+            pos[i + 1] -= 0.22;
+            pos[i + 4] -= 0.22;
+            pos[i] -= 0.03;
             pos[i + 3] -= 0.03;
 
-            // Zurücksetzen wenn unten aus dem Fenster gefallen
             if (pos[i + 1] < wPos.y - wH / 2) {
                 const newX = wPos.x + (Math.random() - 0.5) * (wW - 0.2);
                 pos[i] = newX;
@@ -421,26 +469,7 @@ function animateEngine() {
         rainLineSystem.geometry.attributes.position.needsUpdate = true;
     }
 
-    // 2. Rinnende Tropfen bewegen
-    if (glassDropletsSystem) {
-        const pos = glassDropletsSystem.geometry.attributes.position.array;
-        const data = glassDropletsSystem.userData;
-
-        for (let i = 0; i < data.length; i++) {
-            const idx = i * 3;
-            pos[idx + 1] -= data[i].speedY;
-            data[i].life -= delta * 0.3;
-
-            if (data[i].life <= 0 || pos[idx + 1] < wPos.y - wH / 2) {
-                pos[idx] = wPos.x + (Math.random() - 0.5) * (wW - 0.3);
-                pos[idx + 1] = wPos.y + (Math.random() - 0.5) * (wH - 0.3);
-                data[i].life = Math.random() * 0.8 + 0.2;
-            }
-        }
-        glassDropletsSystem.geometry.attributes.position.needsUpdate = true;
-    }
-
-    // Blitzeffekt
+    // Gewitterblitz
     if (Math.random() > 0.991) {
         lightningLight.intensity = 200 + Math.random() * 220;
     } else {
