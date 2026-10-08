@@ -23,7 +23,36 @@ function init() {
     renderer.toneMappingExposure = 1.1;
 
     setupLighting();
-    createProceduralRealisticFloor(); // Lädt deine echten Bilder für den Boden
+    /* 1. EDLER, REALISTISCHER DIELENBODEN MIT ECHTEN TEXTUREN */
+function createProceduralRealisticFloor() {
+    const textureLoader = new THREE.TextureLoader();
+
+    // Lädt die Bilder und gibt eine Warnung aus, falls der Pfad falsch ist
+    const colorMap = textureLoader.load('color.jpg', undefined, undefined, () => console.error("Bild 'color.jpg' nicht gefunden!"));
+    const normalMap = textureLoader.load('normal.jpg', undefined, undefined, () => console.error("Bild 'normal.jpg' nicht gefunden!"));
+    const roughnessMap = textureLoader.load('roughness.jpg', undefined, undefined, () => console.error("Bild 'roughness.jpg' nicht gefunden!"));
+
+    [colorMap, normalMap, roughnessMap].forEach(tex => {
+        tex.wrapS = THREE.RepeatWrapping;
+        tex.wrapT = THREE.RepeatWrapping;
+        tex.repeat.set(6, 4);
+    });
+
+    const floorMat = new THREE.MeshStandardMaterial({
+        map: colorMap,
+        normalMap: normalMap,
+        roughnessMap: roughnessMap,
+        color: 0x5c3619 // Ersatzfarbe, falls Texturen noch laden
+    });
+
+    const floorGeo = new THREE.PlaneGeometry(30, 20);
+    const floor = new THREE.Mesh(floorGeo, floorMat);
+    floor.rotation.x = -Math.PI / 2;
+    floor.position.y = -1.2;
+    
+    scene.add(floor);
+}
+
     createGroundedDetailedCrate();
     createLargeAtmosphericWindow();
 
