@@ -1,11 +1,10 @@
 /* ============================================================================
- * PARTY CHAOS - COMPLETE ATMOSPHERIC NOIR CSS
+ * PARTY CHAOS - ASSASSIN'S CREED & DARK ADVENTURE DESIGN SYSTEM
  * ============================================================================ */
 
 :root {
     --bg-primary: #010204;
     --font-heading: -apple-system, BlinkMacSystemFont, "Trebuchet MS", "Segoe UI", Roboto, sans-serif;
-    --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --font-mono: "SF Mono", "Courier New", Courier, monospace;
 }
 
@@ -22,11 +21,10 @@ html, body {
     height: 100%;
     overflow: hidden;
     background-color: var(--bg-primary);
-    font-family: var(--font-body);
     color: #ffffff;
 }
 
-/* 3D CANVAS LAYER */
+/* 3D CANVAS */
 #stage3d {
     position: fixed;
     top: 0;
@@ -37,7 +35,7 @@ html, body {
     display: block;
 }
 
-/* CINEMATIC SHADERS */
+/* CINEMATIC OVERLAYS */
 .cinematic-vignette {
     position: fixed;
     top: 0;
@@ -46,7 +44,7 @@ html, body {
     height: 100%;
     z-index: 2;
     pointer-events: none;
-    background: radial-gradient(circle at center, transparent 45%, rgba(1, 2, 4, 0.55) 75%, rgba(0, 0, 0, 0.98) 100%);
+    background: radial-gradient(circle at center, transparent 35%, rgba(1, 2, 4, 0.6) 70%, rgba(0, 0, 0, 0.98) 100%);
 }
 
 .cinematic-scanlines {
@@ -57,9 +55,9 @@ html, body {
     height: 100%;
     z-index: 3;
     pointer-events: none;
-    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.28) 50%);
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
     background-size: 100% 4px;
-    opacity: 0.35;
+    opacity: 0.3;
 }
 
 .cinematic-grain {
@@ -70,9 +68,9 @@ html, body {
     height: 200%;
     z-index: 4;
     pointer-events: none;
-    background-image: repeating-radial-gradient(circle at 17% 32%, rgba(255, 255, 255, 0.035), rgba(0, 0, 0, 0.06) 2px);
+    background-image: repeating-radial-gradient(circle at 17% 32%, rgba(255, 255, 255, 0.03), rgba(0, 0, 0, 0.05) 2px);
     animation: grainJitter 0.18s steps(2) infinite;
-    opacity: 0.3;
+    opacity: 0.25;
 }
 
 @keyframes grainJitter {
@@ -84,7 +82,7 @@ html, body {
     100% { transform: translate(0, 0); }
 }
 
-/* LAYOUT OVERLAY */
+/* UI OVERLAY LAYOUT */
 .ui-overlay {
     position: fixed;
     top: 0;
@@ -94,7 +92,7 @@ html, body {
     z-index: 10;
     display: grid;
     grid-template-rows: auto 1fr auto;
-    padding: 64px 64px 24px 64px;
+    padding: 50px 60px 30px 60px;
     pointer-events: none;
 }
 
@@ -103,51 +101,49 @@ html, body {
     display: inline-block;
 }
 
-/* OVERHAULED BADGE */
+/* LOGO BADGE */
 .logo-badge {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
-    padding: 6px 16px;
-    background: rgba(8, 14, 22, 0.75);
-    border: 1px solid rgba(136, 204, 255, 0.35);
-    border-radius: 4px;
+    gap: 8px;
+    padding: 6px 14px;
+    background: rgba(12, 20, 32, 0.85);
+    border: 1px solid rgba(136, 204, 255, 0.3);
+    border-radius: 2px;
     font-family: var(--font-mono);
     font-size: 0.7rem;
     font-weight: 700;
     color: #88ccff;
-    letter-spacing: 3px;
+    letter-spacing: 2.5px;
     text-transform: uppercase;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.9), inset 0 0 10px rgba(136, 204, 255, 0.1);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
 }
 
-.logo-badge::before {
-    content: "";
-    width: 7px;
-    height: 7px;
+.badge-pulse {
+    width: 6px;
+    height: 6px;
     background-color: #88ccff;
     border-radius: 50%;
-    box-shadow: 0 0 10px #88ccff;
-    animation: badgePulse 2s infinite ease-in-out;
+    box-shadow: 0 0 8px #88ccff;
+    animation: pulse 2s infinite ease-in-out;
 }
 
-@keyframes badgePulse {
+@keyframes pulse {
     0%, 100% { opacity: 0.3; transform: scale(0.8); }
-    50% { opacity: 1; transform: scale(1.2); }
+    50% { opacity: 1; transform: scale(1.3); }
 }
 
 .logo-title {
     font-family: var(--font-heading);
-    font-size: 4.8rem;
+    font-size: 4.5rem;
     font-weight: 900;
-    line-height: 0.85;
+    line-height: 0.88;
     text-transform: uppercase;
-    letter-spacing: -3px;
+    letter-spacing: -2px;
     color: #ffffff;
-    text-shadow: 0 0 35px rgba(136, 204, 255, 0.4), 0 10px 25px rgba(0, 0, 0, 0.95);
-    margin-top: 10px;
+    text-shadow: 0 0 30px rgba(136, 204, 255, 0.3), 0 10px 30px rgba(0, 0, 0, 0.9);
+    margin-top: 12px;
 }
 
 .ui-main {
@@ -155,40 +151,42 @@ html, body {
     align-items: center;
 }
 
-/* OVERHAULED MENU CONTAINER & BUTTONS */
+/* MENÜ CONTAINER */
 .menu-container {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 14px;
     width: 100%;
     max-width: 320px;
     pointer-events: auto;
 }
 
+/* LEBENDIGE, ATMOSPHÄRISCHE BUTTONS */
 .menu-btn {
     position: relative;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: linear-gradient(90deg, rgba(10, 16, 26, 0.88) 0%, rgba(4, 7, 12, 0.6) 100%);
-    border: 1px solid rgba(136, 204, 255, 0.15);
-    border-left: 3px solid rgba(136, 204, 255, 0.4);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    color: #c0dbf7;
-    padding: 14px 20px;
+    background: linear-gradient(90deg, rgba(14, 22, 34, 0.85) 0%, rgba(6, 10, 16, 0.7) 100%);
+    border: 1px solid rgba(136, 204, 255, 0.18);
+    border-left: 4px solid rgba(136, 204, 255, 0.5);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    color: #d0e5fc;
+    padding: 16px 22px;
     font-family: var(--font-heading);
     font-size: 0.95rem;
     font-weight: 800;
     letter-spacing: 2.5px;
     text-transform: uppercase;
-    border-radius: 3px;
+    border-radius: 2px;
     cursor: pointer;
     overflow: hidden;
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.75);
 }
 
+/* Dynamischer Glanzstreifen beim Drüberfahren */
 .menu-btn::before {
     content: "";
     position: absolute;
@@ -196,8 +194,8 @@ html, body {
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent 0%, rgba(136, 204, 255, 0.2) 50%, transparent 100%);
-    transition: 0.5s ease;
+    background: linear-gradient(90deg, transparent 0%, rgba(136, 204, 255, 0.25) 50%, transparent 100%);
+    transition: left 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .menu-btn:hover::before {
@@ -205,64 +203,52 @@ html, body {
 }
 
 .menu-btn:hover {
-    background: linear-gradient(90deg, rgba(22, 38, 58, 0.9) 0%, rgba(10, 18, 30, 0.75) 100%);
-    border-color: rgba(136, 204, 255, 0.6);
+    background: linear-gradient(90deg, rgba(28, 48, 72, 0.9) 0%, rgba(12, 22, 36, 0.8) 100%);
+    border-color: rgba(136, 204, 255, 0.7);
     border-left-color: #88ccff;
     color: #ffffff;
-    transform: translateX(8px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9), -5px 0 15px rgba(136, 204, 255, 0.25);
+    transform: translateX(10px);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.9), -5px 0 20px rgba(136, 204, 255, 0.3);
 }
 
 .menu-btn:active {
-    transform: translateX(4px) scale(0.98);
+    transform: translateX(5px) scale(0.98);
 }
 
-.menu-btn-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 26px;
-    height: 26px;
-    background: rgba(136, 204, 255, 0.08);
-    border: 1px solid rgba(136, 204, 255, 0.2);
-    border-radius: 3px;
-    font-size: 0.75rem;
-    color: rgba(136, 204, 255, 0.7);
-    transition: all 0.25s ease;
+/* GLYPH ICONS (Subtil & Mystisch) */
+.btn-glyph {
+    font-size: 0.85rem;
+    color: rgba(136, 204, 255, 0.6);
+    transition: all 0.3s ease;
 }
 
-.menu-btn:hover .menu-btn-icon {
-    background: #88ccff;
-    border-color: #88ccff;
-    color: #020408;
-    box-shadow: 0 0 12px #88ccff;
+.menu-btn:hover .btn-glyph {
+    color: #88ccff;
+    transform: scale(1.3) rotate(45deg);
+    text-shadow: 0 0 10px #88ccff;
 }
 
-/* PRIMARY BUTTON (SPIEL ERSTELLEN) */
+/* PRIMÄRER BUTTON (SPIEL ERSTELLEN - ASSASSIN'S BERNSTEIN-LOOK) */
 .menu-btn--primary {
     border-left-color: #ffaa55;
-    background: linear-gradient(90deg, rgba(32, 18, 10, 0.9) 0%, rgba(12, 6, 3, 0.65) 100%);
+    background: linear-gradient(90deg, rgba(38, 22, 12, 0.9) 0%, rgba(16, 8, 4, 0.75) 100%);
     border-color: rgba(255, 170, 85, 0.25);
 }
 
 .menu-btn--primary:hover {
-    background: linear-gradient(90deg, rgba(58, 32, 16, 0.95) 0%, rgba(24, 12, 6, 0.8) 100%);
-    border-color: rgba(255, 170, 85, 0.7);
+    background: linear-gradient(90deg, rgba(68, 38, 20, 0.95) 0%, rgba(30, 14, 6, 0.85) 100%);
+    border-color: rgba(255, 170, 85, 0.8);
     border-left-color: #ffaa55;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9), -5px 0 15px rgba(255, 170, 85, 0.3);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.9), -5px 0 20px rgba(255, 170, 85, 0.35);
 }
 
-.menu-btn--primary .menu-btn-icon {
+.menu-btn--primary .btn-glyph {
+    color: rgba(255, 170, 85, 0.7);
+}
+
+.menu-btn--primary:hover .btn-glyph {
     color: #ffaa55;
-    background: rgba(255, 170, 85, 0.1);
-    border-color: rgba(255, 170, 85, 0.3);
-}
-
-.menu-btn--primary:hover .menu-btn-icon {
-    background: #ffaa55;
-    border-color: #ffaa55;
-    color: #080402;
-    box-shadow: 0 0 12px #ffaa55;
+    text-shadow: 0 0 10px #ffaa55;
 }
 
 /* FOOTER */
@@ -298,15 +284,15 @@ html, body {
     box-shadow: 0 0 8px #00ff88;
 }
 
-/* RESPONSIVE */
+/* RESPONSIVE IPAD / MOBILE */
 @media (max-width: 1024px) {
-    .ui-overlay { padding: 32px 32px 16px 32px; }
-    .logo-title { font-size: 3.8rem; }
+    .ui-overlay { padding: 30px; }
+    .logo-title { font-size: 3.6rem; }
     .menu-container { max-width: 290px; }
 }
 
 @media (max-width: 600px) {
-    .ui-overlay { padding: 16px; }
+    .ui-overlay { padding: 20px; }
     .logo-title { font-size: 2.6rem; }
     .menu-container { max-width: 100%; }
     .ui-footer { flex-direction: column; align-items: flex-start; gap: 8px; }
