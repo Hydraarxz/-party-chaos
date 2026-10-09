@@ -5,15 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Party Chaos</title>
     
-    <!-- CSS-Einbindung mit Cache-Buster -->
-    <link rel="stylesheet" href="style.css?v=8000">
+    <!-- CSS-Einbindung mit neuem Cache-Buster -->
+    <link rel="stylesheet" href="style.css?v=10000">
 </head>
 <body>
 
     <!-- 3D WebGL Canvas Layer -->
     <canvas id="stage3d"></canvas>
 
-    <!-- Retro / Noir Effekt-Layer -->
+    <!-- Retro / Noir / Animus Effekt-Layer -->
     <div class="cinematic-vignette"></div>
     <div class="cinematic-scanlines"></div>
     <div class="cinematic-grain"></div>
@@ -24,32 +24,35 @@
         <!-- HEADER / LOGO -->
         <header class="ui-header">
             <div class="logo-container">
-                <span class="logo-badge">v1.0 • Rainy Noir Edition</span>
+                <span class="logo-badge">
+                    <span class="badge-pulse"></span>
+                    v1.0 • Rainy Noir Edition
+                </span>
                 <h1 class="logo-title">PARTY<br>CHAOS</h1>
             </div>
         </header>
 
-        <!-- MAIN MENU BUTTONS -->
+        <!-- MAIN MENU BUTTONS (OHNE EMOJIS, DAFÜR LEBENDIGE EFFEKTE) -->
         <main class="ui-main">
             <nav class="menu-container">
                 <button class="menu-btn menu-btn--primary" onclick="createGame()">
-                    <span>Spiel Erstellen</span>
-                    <span class="menu-btn-icon">➔</span>
+                    <span class="btn-text">Spiel Erstellen</span>
+                    <span class="btn-glyph">◆</span>
                 </button>
                 
                 <button class="menu-btn" onclick="joinGame()">
-                    <span>Spiel Beitreten</span>
-                    <span class="menu-btn-icon">➔</span>
+                    <span class="btn-text">Spiel Beitreten</span>
+                    <span class="btn-glyph">◈</span>
                 </button>
                 
                 <button class="menu-btn" onclick="openSettings()">
-                    <span>Einstellungen</span>
-                    <span class="menu-btn-icon">⚙</span>
+                    <span class="btn-text">Einstellungen</span>
+                    <span class="btn-glyph">⚙</span>
                 </button>
                 
                 <button class="menu-btn" onclick="openInstructions()">
-                    <span>Anleitung</span>
-                    <span class="menu-btn-icon">📜</span>
+                    <span class="btn-text">Anleitung</span>
+                    <span class="btn-glyph">📜</span>
                 </button>
             </nav>
         </main>
@@ -66,6 +69,6 @@
     </div>
 
     <!-- JavaScript Modul Start -->
-    <script type="module" src="script.js?v=9000"></script>
+    <script type="module" src="script.js?v=10000"></script>
 </body>
 </html>
